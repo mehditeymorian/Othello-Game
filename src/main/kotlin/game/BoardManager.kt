@@ -1,12 +1,18 @@
 package game
 
 class BoardManager {
-    var board: Array<Array<Side>> = TODO()
-    var turn: Side
+    var board: Array<Array<Side?>> = Array(8){ arrayOfNulls(8) }
+    var turn: Side = TODO()
 
 
     // all initialization
     fun start() {
+
+    }
+
+    fun initBoard() {
+        // init board
+        // 2 white 2 black
 
     }
 
