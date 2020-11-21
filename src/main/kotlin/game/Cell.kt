@@ -1,3 +1,3 @@
 package game
 
-class Cell(x: Int, y: Int)
+data class Cell(val x: Int,val y: Int)
