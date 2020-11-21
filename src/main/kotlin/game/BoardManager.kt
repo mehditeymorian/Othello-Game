@@ -2,7 +2,7 @@ package game
 
 class BoardManager {
     var board: Array<Array<Side?>> = Array(8){ arrayOfNulls(8) }
-    var turn: Side = TODO()
+    var turn: Side = Side.BLACK
 
 
     // all initialization
@@ -18,7 +18,8 @@ class BoardManager {
 
     // make a move on board with respect to turn
     fun move(x: Int, y: Int) {
-        TODO()
+        board[x][y] = turn
+        turn = if (turn == Side.BLACK) Side.WHITE else Side.BLACK
     }
 
 
