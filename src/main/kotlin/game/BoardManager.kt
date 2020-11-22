@@ -15,7 +15,10 @@ class BoardManager {
     fun initBoard() {
         // init board
         // 2 white 2 black
-
+        board[3][3] = Side.WHITE
+        board[3][4] = Side.BLACK
+        board[4][3] = Side.BLACK
+        board[4][4] = Side.WHITE
     }
 
     // make a move on board with respect to turn
