@@ -1,6 +1,6 @@
 package game
 
-class BoardManager(boardEventListener: BoardEventListener) {
+class BoardManager(val eventListener: BoardEventListener) {
     private val boardSize = 8
     var board: Array<Array<Side?>> = Array(boardSize) { arrayOfNulls(boardSize) }
     var turn: Side = Side.BLACK
@@ -18,14 +18,28 @@ class BoardManager(boardEventListener: BoardEventListener) {
 
     // all initialization
     fun start() {
-
+        eventListener.makeMove(turn, availableCells())
     }
 
 
     // make a move on board with respect to turn
     fun putDisk(x: Int, y: Int) {
-        board[x][y] = turn
-        turn = if (turn == Side.BLACK) Side.WHITE else Side.BLACK
+        board[x][y] = turn // put disk
+        flipCellsAfterMove(x,y).forEach { board[it.x][it.y] = board[it.x][it.y]?.flip() } // flip disks
+        if (isGameFinished()) {
+            eventListener.onGameFinish(getWinner())
+            return
+        }
+
+        turn = turn.flip()
+        val list = availableCells()
+        if (list.isEmpty()) { // no move possible
+            turn = turn.flip()
+            eventListener.makeMove(turn, availableCells())
+        } else eventListener.makeMove(turn, list)
+
+
+
     }
 
 
@@ -111,13 +125,13 @@ class BoardManager(boardEventListener: BoardEventListener) {
         }
 
         for (i in 0..moveList.size - 1) {
-            println(moveList[i].x.toString()+"  ||  "+moveList[i].y.toString())
+            println(moveList[i].x.toString() + "  ||  " + moveList[i].y.toString())
         }
 
         return moveList
     }
 
-    fun identifyOponent(board: Array<Array<Side?>> , row: Int, column: Int, direction: String) {
+    fun identifyOponent(board: Array<Array<Side?>>, row: Int, column: Int, direction: String) {
 
         var oponent: Side = Side.BLACK
         if (turn == Side.BLACK) {
@@ -339,7 +353,7 @@ class BoardManager(boardEventListener: BoardEventListener) {
 
             else -> {
                 println("No thing")
-                moveList.add(Cell(-1,-1))
+                moveList.add(Cell(-1, -1))
             }
 
         }
@@ -438,7 +452,7 @@ class BoardManager(boardEventListener: BoardEventListener) {
                 break
             }
 
-            if (xOffset != x) for (newX in x - 1 downTo  xOffset + 1) list.add(Cell(newX, y - (x - newX)))
+            if (xOffset != x) for (newX in x - 1 downTo xOffset + 1) list.add(Cell(newX, y - (x - newX)))
         }
 
         return list
@@ -462,10 +476,21 @@ class BoardManager(boardEventListener: BoardEventListener) {
     fun printBoard() {
         println("========================")
         board.forEach {
-            it.forEach { side: Side? -> print( if(side == null) "   " else if(side == Side.BLACK) " B " else " W ") }
+            it.forEach { side: Side? -> print(if (side == null) "   " else if (side == Side.BLACK) " B " else " W ") }
             println()
         }
         println("========================")
+    }
+
+    fun getWinner(): Side? {
+        var black = 0
+        var white = 0
+
+        for (row in board)
+            for (each in row)
+                if (each == Side.BLACK) black++
+                else if (each == Side.WHITE) white++
+        return if (black > white) Side.BLACK else if (white > black) Side.WHITE else null
     }
 
 }
