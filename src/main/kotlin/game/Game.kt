@@ -28,7 +28,7 @@ class Game : BoardEventListener {
         } else {
             val x = line[0].toInt()
             val y = line[1].toInt()
-            boardManager.putDisk(x, y)
+            boardManager.putDisk(x, y,availableCells)
 
         }
 

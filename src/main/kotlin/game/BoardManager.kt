@@ -23,7 +23,14 @@ class BoardManager(val eventListener: BoardEventListener) {
 
 
     // make a move on board with respect to turn
-    fun putDisk(x: Int, y: Int) {
+    fun putDisk(x: Int, y: Int, availableCells: List<Cell>) {
+        if (availableCells.none { cell -> cell.x == x && cell.y == y }) {
+            println("You can select only from available cells")
+            eventListener.makeMove(turn,availableCells)
+            return
+        }
+
+
         board[x][y] = turn // put disk
         flipCellsAfterMove(x,y).forEach { board[it.x][it.y] = board[it.x][it.y]?.flip() } // flip disks
         if (isGameFinished()) {
