@@ -7,11 +7,6 @@ class BoardManager(boardEventListener: BoardEventListener) {
     var moveList: ArrayList<Cell> = ArrayList()
 
 
-    // all initialization
-    fun start() {
-
-    }
-
     fun initBoard() {
         // init board
         // 2 white 2 black
@@ -21,8 +16,14 @@ class BoardManager(boardEventListener: BoardEventListener) {
         board[4][4] = Side.WHITE
     }
 
+    // all initialization
+    fun start() {
+
+    }
+
+
     // make a move on board with respect to turn
-    fun move(x: Int, y: Int) {
+    fun putDisk(x: Int, y: Int) {
         board[x][y] = turn
         turn = if (turn == Side.BLACK) Side.WHITE else Side.BLACK
     }
