@@ -450,4 +450,13 @@ class BoardManager {
         TODO()
     }
 
+    fun printBoard() {
+        println("========================")
+        board.forEach {
+            it.forEach { side: Side? -> print( if(side == null) "   " else if(side == Side.BLACK) " B " else " W ") }
+            println()
+        }
+        println("========================")
+    }
+
 }
