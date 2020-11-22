@@ -1,5 +1,7 @@
+import game.Game
+
 fun main() {
-    println("Hello world")
-    
+    val game = Game()
+    game.start()
 }
 
