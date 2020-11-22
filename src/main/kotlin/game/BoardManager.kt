@@ -1,6 +1,6 @@
 package game
 
-class BoardManager {
+class BoardManager(boardEventListener: BoardEventListener) {
     private val boardSize = 8
     var board: Array<Array<Side?>> = Array(boardSize) { arrayOfNulls(boardSize) }
     var turn: Side = Side.BLACK
