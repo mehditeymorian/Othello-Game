@@ -515,4 +515,29 @@ class BoardManager(val eventListener: BoardEventListener) {
     fun indicesOkay(x: Int, y: Int): Boolean {
         return x < boardSize && y < boardSize
     }
+
+    fun printBoardWithAvailableCells(availableCells: List<Cell>) {
+        val copy: Array<Array<String?>> = Array(boardSize) { arrayOfNulls(boardSize) }
+
+        board.forEachIndexed {x, row ->
+            row.forEachIndexed{y, side ->
+                copy[x][y] = if (side == null) "   " else if (side == Side.BLACK) " B " else " W "
+            }
+        }
+
+        availableCells.forEach { copy[it.x][it.y] =  " . "}
+
+        println("===========================")
+        print("   ")
+        for (i in 0..7) print(" $i ")
+        println()
+        var i = 0
+        copy.forEach {
+            print(" $i ")
+            it.forEach(::print)
+            println()
+            i++
+        }
+        println("===========================")
+    }
 }
