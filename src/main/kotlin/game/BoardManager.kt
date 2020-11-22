@@ -471,11 +471,6 @@ class BoardManager(val eventListener: BoardEventListener) {
         return list
     }
 
-    // return a boolean, indicating whether current player can make a move
-    private fun canPlayerMakeMove(): Boolean {
-        TODO()
-    }
-
     // return a boolean indicating whether game is finished
     fun isGameFinished(): Boolean {
         for (row in board)
