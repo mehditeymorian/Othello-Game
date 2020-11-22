@@ -446,8 +446,13 @@ class BoardManager {
     }
 
     // return a boolean indicating whether game is finished
-    private fun isGameFinished(): Boolean {
-        TODO()
+    fun isGameFinished(): Boolean {
+        for (row in board)
+            for (each in row)
+                if (each == null)
+                    return false
+
+        return true
     }
 
     fun printBoard() {
