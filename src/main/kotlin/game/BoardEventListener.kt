@@ -8,6 +8,6 @@ interface BoardEventListener {
 
     fun putDiskOnBoard(cell: Cell)
 
-    fun makeMove(turn: Side)
+    fun makeMove(turn: Side, availableCells: List<Cell>)
 
 }
