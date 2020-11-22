@@ -10,12 +10,14 @@ class Game : BoardEventListener {
     }
 
     override fun onGameFinish(winner: Side?) {
+        boardManager.printBoard()
         val result = if (winner == null) "Draw" else "${winner.name} wins!"
         println(result)
     }
 
 
     override fun makeMove(turn: Side, availableCells: List<Cell>) {
+        boardManager.printBoard()
         print("${turn.name} Move:")
         val line = readLine()?.split(" ")
         if (line == null) {
