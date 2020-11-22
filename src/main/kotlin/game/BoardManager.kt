@@ -45,15 +45,7 @@ class BoardManager(val eventListener: BoardEventListener) {
 
     // returns available cells to make a move with respect to turn
     fun availableCells(): ArrayList<Cell> {
-
-        board[2][3] = Side.BLACK
-        board[3][3] = Side.BLACK
-        board[3][4] = Side.BLACK
-        board[4][3] = Side.BLACK
-        board[4][2] = Side.WHITE
-        board[4][4] = Side.WHITE
-        board[5][3] = Side.WHITE
-        board[6][2] = Side.WHITE
+        moveList.clear()
 
         for (i in 0..7) {
             for (j in 0..7) {
@@ -124,11 +116,9 @@ class BoardManager(val eventListener: BoardEventListener) {
             }
         }
 
-        for (i in 0..moveList.size - 1) {
-            println(moveList[i].x.toString() + "  ||  " + moveList[i].y.toString())
-        }
 
-        return moveList
+
+        return moveList.distinct() as ArrayList<Cell>
     }
 
     fun identifyOponent(board: Array<Array<Side?>>, row: Int, column: Int, direction: String) {
@@ -367,7 +357,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check top
         if (x != 0 && board[x - 1][y] != null) { // check if item is not on edge and next cell in that direction is not empty
             var xOffset = x // first disk with same color in top direction
-            for (i in x - 1 downTo 0) if (board[x][y] == board[i][y]) { // check for the first cell with same side
+            for (i in x - 1 downTo 0)
+                if (!indicesOkay(i,y) || board[i][y] == null) break
+                else if (board[x][y] == board[i][y]) { // check for the first cell with same side
                 xOffset = i
                 break
             }
@@ -380,7 +372,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check top right
         if (x != 0 && y != boardSize - 1 && board[x - 1][y + 1] != null) {
             var xOffset = x
-            for (i in x - 1 downTo 0) if (board[x][y] == board[i][y + (x - i)]) {// row decrement, column increment
+            for (i in x - 1 downTo 0)
+                if (!indicesOkay(i,y + (x - i)) || board[i][y + (x - i)] == null) break
+                else if (board[x][y] == board[i][y + (x - i)]) {// row decrement, column increment
                 xOffset = i
                 break
             }
@@ -389,9 +383,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         }
 
         // check right
-        if (y != 0 && board[x][y + 1] != null) {
+        if (y != boardSize-1 && board[x][y + 1] != null) {
             var yOffset = y
-            for (i in y + 1 until boardSize) if (board[x][y] == board[x][i]) {// row no change, column increment
+            for (i in y + 1 until boardSize)
+                if (!indicesOkay(x,i) || board[x][i] == null) break
+                else if (board[x][y] == board[x][i]) {// row no change, column increment
                 yOffset = i
                 break
             }
@@ -402,7 +398,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check bottom right
         if (x != boardSize - 1 && y != boardSize - 1 && board[x + 1][y + 1] != null) {
             var xOffset = x
-            for (i in x + 1 until boardSize) if (board[x][y] == board[i][y + (i - x)]) {// row increment, column increment
+            for (i in x + 1 until boardSize)
+                if (!indicesOkay(i,y + (i-x)) || board[i][y + (i - x)] == null) break
+                else if (board[x][y] == board[i][y + (i - x)]) {// row increment, column increment
                 xOffset = i
                 break
             }
@@ -413,7 +411,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check bottom
         if (x != boardSize - 1 && board[x + 1][y] != null) {
             var xOffset = x
-            for (i in x + 1 until boardSize) if (board[x][y] == board[i][y]) { // check for the first cell with same side
+            for (i in x + 1 until boardSize)
+                if (!indicesOkay(i,y) || board[i][y] == null) break
+                else if (board[x][y] == board[i][y]) { // check for the first cell with same side
                 xOffset = i
                 break
             }
@@ -425,7 +425,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check bottom left
         if (x != 0 && y != 0 && board[x + 1][y - 1] != null) {
             var xOffset = x
-            for (i in x + 1 until boardSize) if (board[x][y] == board[i][y - (i - x)]) {// row increment, column decrement
+            for (i in x + 1 until boardSize)
+                if (!indicesOkay(i,y - (i - x)) || board[i][y - (i - x)] == null) break
+                else if (board[x][y] == board[i][y - (i - x)]) {// row increment, column decrement
                 xOffset = i
                 break
             }
@@ -436,7 +438,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check left
         if (y != 0 && board[x][y - 1] != null) {
             var yOffset = y
-            for (i in y - 1 downTo 0) if (board[x][y] == board[x][i]) {// row no change, column decrement
+            for (i in y - 1 downTo 0)
+                if (!indicesOkay(x,i) || board[x][i] == null) break
+                else if (board[x][y] == board[x][i]) {// row no change, column decrement
                 yOffset = i
                 break
             }
@@ -447,7 +451,9 @@ class BoardManager(val eventListener: BoardEventListener) {
         // check top left
         if (x != 0 && y != 0 && board[x - 1][y - 1] != null) {
             var xOffset = x
-            for (i in x - 1 downTo 0) if (board[x][y] == board[i][y - (x - i)]) {// row increment, column increment
+            for (i in x - 1 downTo 0)
+                if (!indicesOkay(i,y - (x - i)) || board[i][y - (x - i)] == null) break
+                else if (board[x][y] == board[i][y - (x - i)]) {// row increment, column increment
                 xOffset = i
                 break
             }
@@ -474,12 +480,18 @@ class BoardManager(val eventListener: BoardEventListener) {
     }
 
     fun printBoard() {
-        println("========================")
+        println("===========================")
+        print("   ")
+        for (i in 0..7) print(" $i ")
+        println()
+        var i = 0
         board.forEach {
+            print(" $i ")
             it.forEach { side: Side? -> print(if (side == null) "   " else if (side == Side.BLACK) " B " else " W ") }
             println()
+            i++
         }
-        println("========================")
+        println("===========================")
     }
 
     fun getWinner(): Side? {
@@ -493,4 +505,7 @@ class BoardManager(val eventListener: BoardEventListener) {
         return if (black > white) Side.BLACK else if (white > black) Side.WHITE else null
     }
 
+    fun indicesOkay(x: Int, y: Int): Boolean {
+        return x < boardSize && y < boardSize
+    }
 }
