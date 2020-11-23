@@ -17,7 +17,6 @@ class Game : BoardEventListener {
 
 
     override fun makeMove(turn: Side, availableCells: List<Cell>) {
-        for (cell in availableCells) println("X:${cell.x} Y:${cell.y}")
 
         boardManager.printBoardWithAvailableCells(availableCells)
         print("${turn.name} Move:")

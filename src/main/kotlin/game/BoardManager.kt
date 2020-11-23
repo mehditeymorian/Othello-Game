@@ -14,6 +14,25 @@ class BoardManager(val eventListener: BoardEventListener) {
         board[3][4] = Side.BLACK
         board[4][3] = Side.BLACK
         board[4][4] = Side.WHITE
+//
+//
+//
+//        board[0][4] = Side.WHITE
+//        board[1][4] = Side.WHITE
+//        board[2][3] = Side.BLACK
+//        board[2][4] = Side.WHITE
+//        board[2][6] = Side.BLACK
+//        board[3][3] = Side.WHITE
+//        board[3][4] = Side.WHITE
+//        board[3][5] = Side.BLACK
+//        board[4][2] = Side.WHITE
+//        board[4][3] = Side.WHITE
+//        board[4][4] = Side.BLACK
+//        board[5][1] = Side.WHITE
+//        board[5][5] = Side.BLACK
+//        board[6][0] = Side.WHITE
+
+
     }
 
     // all initialization
@@ -89,7 +108,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                     if (j == 7 && 0 < i && i < 7) {
                         identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "leftt_up")
+                        identifyOponent(board, i, j, "left_up")
                         identifyOponent(board, i, j, "left")
                         identifyOponent(board, i, j, "left_down")
                         identifyOponent(board, i, j, "down")
@@ -273,7 +292,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 var j = column
                 var i = row
 
-                while (j < 7 && i > 0) {
+                while (j < 7 && i < 7) {
                     if (board[i + 1][j + 1] == null) {
                         j_tmp = j + 1
                         i_tmp = i + 1
