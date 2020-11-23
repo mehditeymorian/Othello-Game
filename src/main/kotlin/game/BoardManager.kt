@@ -349,8 +349,7 @@ class BoardManager(val eventListener: BoardEventListener) {
 
 
             else -> {
-                println("No thing")
-                moveList.add(Cell(-1, -1))
+                return
             }
 
         }
@@ -430,7 +429,7 @@ class BoardManager(val eventListener: BoardEventListener) {
         }
 
         // check bottom left
-        if (x != boardSize - 1 && y != 0 && board[x + 1][y - 1] != null) {
+        if (x != 0 && y != 0 && board[x + 1][y - 1] != null) {
             var xOffset = x
             for (i in x + 1 until boardSize)
                 if (!indicesOkay(i,y - (i - x)) || board[i][y - (i - x)] == null) break
