@@ -141,10 +141,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 }
             }
         }
-
-
-
-        return moveList.distinct() as ArrayList<Cell>
+        return moveList
     }
 
     fun identifyOponent(board: Array<Array<Side?>>, row: Int, column: Int, direction: String) {
@@ -174,7 +171,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp < column - 1) {
-                    moveList.add(Cell(row, j_tmp))
+                    val cell = Cell(row , j_tmp)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
 
@@ -204,7 +203,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp < column - 1 && i_tmp < row - 1) {
-                    moveList.add(Cell(i_tmp, j_tmp))
+                    val cell = Cell(i_tmp , j_tmp)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
 
@@ -228,7 +229,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (i_tmp < row - 1) {
-                    moveList.add(Cell(i_tmp, column))
+                    val cell = Cell(row ,column)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
             }
@@ -257,7 +260,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp > column + 1 && i_tmp < row - 1) {
-                    moveList.add(Cell(i_tmp, j_tmp))
+                    val cell = Cell(i_tmp, j_tmp)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
             }
@@ -280,7 +285,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp > column + 1) {
-                    moveList.add(Cell(row, j_tmp))
+                    val cell = Cell(row, j_tmp)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
             }
@@ -309,7 +316,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp > column + 1 && i_tmp > row + 1) {
-                    moveList.add(Cell(i_tmp, j_tmp))
+                    val cell = Cell(i_tmp, j_tmp)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
             }
@@ -332,7 +341,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (i_tmp > row + 1) {
-                    moveList.add(Cell(i_tmp, column))
+                    val cell = Cell(i_tmp, column)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
             }
@@ -361,7 +372,9 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp < column - 1 && i_tmp > row + 1) {
-                    moveList.add(Cell(i_tmp, j_tmp))
+                    val cell = Cell(i_tmp, j_tmp)
+                    if (! moveList.contains(cell))
+                        moveList.add(cell)
                 }
                 return
             }
