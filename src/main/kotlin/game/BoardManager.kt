@@ -6,6 +6,9 @@ class BoardManager(val eventListener: BoardEventListener) {
     var turn: Side = Side.BLACK
     var moveList: ArrayList<Cell> = ArrayList()
 
+    var blackDisksCount = 0
+    var whiteDisksCount = 0
+
 
     fun initBoard() {
         // init board
@@ -14,6 +17,8 @@ class BoardManager(val eventListener: BoardEventListener) {
         board[3][4] = Side.BLACK
         board[4][3] = Side.BLACK
         board[4][4] = Side.WHITE
+        blackDisksCount = 2
+        whiteDisksCount = 2
 //
 //
 //
@@ -504,12 +509,17 @@ class BoardManager(val eventListener: BoardEventListener) {
 
     // return a boolean indicating whether game is finished
     fun isGameFinished(): Boolean {
+        var black = 0
+        var white = 0
+
         for (row in board)
             for (each in row)
-                if (each == null)
-                    return false
+                if (each == Side.BLACK) black++
+                else if (each == Side.WHITE) white++
 
-        return true
+        blackDisksCount = black
+        whiteDisksCount = white
+        return (black+white) == (boardSize*boardSize)
     }
 
     fun printBoard() {
@@ -528,14 +538,7 @@ class BoardManager(val eventListener: BoardEventListener) {
     }
 
     fun getWinner(): Side? {
-        var black = 0
-        var white = 0
-
-        for (row in board)
-            for (each in row)
-                if (each == Side.BLACK) black++
-                else if (each == Side.WHITE) white++
-        return if (black > white) Side.BLACK else if (white > black) Side.WHITE else null
+        return if (blackDisksCount > whiteDisksCount) Side.BLACK else if (whiteDisksCount > blackDisksCount) Side.WHITE else null
     }
 
     fun indicesOkay(x: Int, y: Int): Boolean {
@@ -544,8 +547,6 @@ class BoardManager(val eventListener: BoardEventListener) {
 
     fun printBoardWithAvailableCells(availableCells: List<Cell>) {
         val copy: Array<Array<String?>> = Array(boardSize) { arrayOfNulls(boardSize) }
-
-        availableCells.forEach { println("X : ${it.x}   Y : ${it.y}") }
 
         board.forEachIndexed {x, row ->
             row.forEachIndexed{y, side ->
@@ -566,5 +567,9 @@ class BoardManager(val eventListener: BoardEventListener) {
             i++
         }
         println("===========================")
+    }
+
+    fun printScores() {
+        println( "Black : $blackDisksCount     White : $whiteDisksCount")
     }
 }
