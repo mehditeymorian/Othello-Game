@@ -229,7 +229,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (i_tmp < row - 1) {
-                    val cell = Cell(row ,column)
+                    val cell = Cell(i_tmp ,column)
                     if (! moveList.contains(cell))
                         moveList.add(cell)
                 }
@@ -545,12 +545,13 @@ class BoardManager(val eventListener: BoardEventListener) {
     fun printBoardWithAvailableCells(availableCells: List<Cell>) {
         val copy: Array<Array<String?>> = Array(boardSize) { arrayOfNulls(boardSize) }
 
+        availableCells.forEach { println("X : ${it.x}   Y : ${it.y}") }
+
         board.forEachIndexed {x, row ->
             row.forEachIndexed{y, side ->
                 copy[x][y] = if (side == null) "   " else if (side == Side.BLACK) " B " else " W "
             }
         }
-
         availableCells.forEach { copy[it.x][it.y] =  " . "}
 
         println("===========================")

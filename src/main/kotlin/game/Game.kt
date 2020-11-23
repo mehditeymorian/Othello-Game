@@ -12,7 +12,16 @@ class Game : BoardEventListener {
     override fun onGameFinish(winner: Side?) {
         boardManager.printBoard()
         val result = if (winner == null) "Draw" else "${winner.name} wins!"
+//        var score = 0
+//        for (i in 0 .. 7 ){
+//            for (j in 0 .. 7){
+//                if (boardManager.board[i][j]== Side.BLACK)
+//                    score++
+//            }
+//        }
+//        println( "Black : $score     White : ${64-score}")
         println(result)
+
     }
 
 
