@@ -1,6 +1,6 @@
 package game
 
-class BoardManager(val eventListener: BoardEventListener) {
+class BoardManager(private val eventListener: BoardEventListener) {
     private val boardSize = 8
     var board: Array<Array<Side?>> = Array(boardSize) { arrayOfNulls(boardSize) }
     var turn: Side = Side.BLACK
@@ -19,24 +19,6 @@ class BoardManager(val eventListener: BoardEventListener) {
         board[4][4] = Side.WHITE
         blackDisksCount = 2
         whiteDisksCount = 2
-//
-//
-//
-//        board[0][4] = Side.WHITE
-//        board[1][4] = Side.WHITE
-//        board[2][3] = Side.BLACK
-//        board[2][4] = Side.WHITE
-//        board[2][6] = Side.BLACK
-//        board[3][3] = Side.WHITE
-//        board[3][4] = Side.WHITE
-//        board[3][5] = Side.BLACK
-//        board[4][2] = Side.WHITE
-//        board[4][3] = Side.WHITE
-//        board[4][4] = Side.BLACK
-//        board[5][1] = Side.WHITE
-//        board[5][5] = Side.BLACK
-//        board[6][0] = Side.WHITE
-
 
     }
 
@@ -50,13 +32,13 @@ class BoardManager(val eventListener: BoardEventListener) {
     fun putDisk(x: Int, y: Int, availableCells: List<Cell>) {
         if (availableCells.none { cell -> cell.x == x && cell.y == y }) {
             println("You can select only from available cells")
-            eventListener.makeMove(turn,availableCells)
+            eventListener.makeMove(turn, availableCells)
             return
         }
 
 
         board[x][y] = turn // put disk
-        flipCellsAfterMove(x,y).forEach { board[it.x][it.y] = board[it.x][it.y]?.flip() } // flip disks
+        flipCellsAfterMove(x, y).forEach { board[it.x][it.y] = board[it.x][it.y]?.flip() } // flip disks
         if (isGameFinished()) {
             eventListener.onGameFinish(getWinner())
             return
@@ -70,12 +52,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         } else eventListener.makeMove(turn, list)
 
 
-
     }
 
 
     // returns available cells to make a move with respect to turn
-    fun availableCells(): ArrayList<Cell> {
+    private fun availableCells(): ArrayList<Cell> {
         moveList.clear()
 
         for (i in 0..7) {
@@ -84,64 +65,64 @@ class BoardManager(val eventListener: BoardEventListener) {
 
                     //---------------------------------------- gooshe ha
                     if (i == 0 && j == 0) {
-                        identifyOponent(board, i, j, "right")
-                        identifyOponent(board, i, j, "down")
-                        identifyOponent(board, i, j, "right_down")
+                        identifyOpponent(board, i, j, "right")
+                        identifyOpponent(board, i, j, "down")
+                        identifyOpponent(board, i, j, "right_down")
                     }
                     if (i == 0 && j == 7) {
-                        identifyOponent(board, i, j, "left")
-                        identifyOponent(board, i, j, "down")
-                        identifyOponent(board, i, j, "left_down")
+                        identifyOpponent(board, i, j, "left")
+                        identifyOpponent(board, i, j, "down")
+                        identifyOpponent(board, i, j, "left_down")
                     }
                     if (i == 7 && j == 0) {
-                        identifyOponent(board, i, j, "right")
-                        identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "right_up")
+                        identifyOpponent(board, i, j, "right")
+                        identifyOpponent(board, i, j, "up")
+                        identifyOpponent(board, i, j, "right_up")
                     }
                     if (i == 7 && j == 7) {
-                        identifyOponent(board, i, j, "left")
-                        identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "left_up")
+                        identifyOpponent(board, i, j, "left")
+                        identifyOpponent(board, i, j, "up")
+                        identifyOpponent(board, i, j, "left_up")
                     }
                     //--------------------------------------- divare ha
                     if (j == 0 && 0 < i && i < 7) {
-                        identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "right_up")
-                        identifyOponent(board, i, j, "right")
-                        identifyOponent(board, i, j, "right_down")
-                        identifyOponent(board, i, j, "down")
+                        identifyOpponent(board, i, j, "up")
+                        identifyOpponent(board, i, j, "right_up")
+                        identifyOpponent(board, i, j, "right")
+                        identifyOpponent(board, i, j, "right_down")
+                        identifyOpponent(board, i, j, "down")
                     }
                     if (j == 7 && 0 < i && i < 7) {
-                        identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "left_up")
-                        identifyOponent(board, i, j, "left")
-                        identifyOponent(board, i, j, "left_down")
-                        identifyOponent(board, i, j, "down")
+                        identifyOpponent(board, i, j, "up")
+                        identifyOpponent(board, i, j, "left_up")
+                        identifyOpponent(board, i, j, "left")
+                        identifyOpponent(board, i, j, "left_down")
+                        identifyOpponent(board, i, j, "down")
                     }
                     if (i == 0 && 0 < j && j < 7) {
-                        identifyOponent(board, i, j, "left")
-                        identifyOponent(board, i, j, "left_down")
-                        identifyOponent(board, i, j, "down")
-                        identifyOponent(board, i, j, "right_down")
-                        identifyOponent(board, i, j, "right")
+                        identifyOpponent(board, i, j, "left")
+                        identifyOpponent(board, i, j, "left_down")
+                        identifyOpponent(board, i, j, "down")
+                        identifyOpponent(board, i, j, "right_down")
+                        identifyOpponent(board, i, j, "right")
                     }
                     if (i == 7 && 0 < j && j < 7) {
-                        identifyOponent(board, i, j, "left")
-                        identifyOponent(board, i, j, "left_up")
-                        identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "right_up")
-                        identifyOponent(board, i, j, "right")
+                        identifyOpponent(board, i, j, "left")
+                        identifyOpponent(board, i, j, "left_up")
+                        identifyOpponent(board, i, j, "up")
+                        identifyOpponent(board, i, j, "right_up")
+                        identifyOpponent(board, i, j, "right")
                     }
                     //---------------------------------------- khoone haie dakheli
                     if (0 < i && i < 7 && 0 < j && j < 7) {
-                        identifyOponent(board, i, j, "left")
-                        identifyOponent(board, i, j, "left_up")
-                        identifyOponent(board, i, j, "up")
-                        identifyOponent(board, i, j, "right_up")
-                        identifyOponent(board, i, j, "right")
-                        identifyOponent(board, i, j, "right_down")
-                        identifyOponent(board, i, j, "down")
-                        identifyOponent(board, i, j, "left_down")
+                        identifyOpponent(board, i, j, "left")
+                        identifyOpponent(board, i, j, "left_up")
+                        identifyOpponent(board, i, j, "up")
+                        identifyOpponent(board, i, j, "right_up")
+                        identifyOpponent(board, i, j, "right")
+                        identifyOpponent(board, i, j, "right_down")
+                        identifyOpponent(board, i, j, "down")
+                        identifyOpponent(board, i, j, "left_down")
                     }
                 }
             }
@@ -149,7 +130,7 @@ class BoardManager(val eventListener: BoardEventListener) {
         return moveList
     }
 
-    fun identifyOponent(board: Array<Array<Side?>>, row: Int, column: Int, direction: String) {
+    private fun identifyOpponent(board: Array<Array<Side?>>, row: Int, column: Int, direction: String) {
 
         var oponent: Side = Side.BLACK
         if (turn == Side.BLACK) {
@@ -176,8 +157,8 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp < column - 1) {
-                    val cell = Cell(row , j_tmp)
-                    if (! moveList.contains(cell))
+                    val cell = Cell(row, j_tmp)
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -208,8 +189,8 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (j_tmp < column - 1 && i_tmp < row - 1) {
-                    val cell = Cell(i_tmp , j_tmp)
-                    if (! moveList.contains(cell))
+                    val cell = Cell(i_tmp, j_tmp)
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -234,8 +215,8 @@ class BoardManager(val eventListener: BoardEventListener) {
                     }
                 }
                 if (i_tmp < row - 1) {
-                    val cell = Cell(i_tmp ,column)
-                    if (! moveList.contains(cell))
+                    val cell = Cell(i_tmp, column)
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -266,7 +247,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 }
                 if (j_tmp > column + 1 && i_tmp < row - 1) {
                     val cell = Cell(i_tmp, j_tmp)
-                    if (! moveList.contains(cell))
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -291,7 +272,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 }
                 if (j_tmp > column + 1) {
                     val cell = Cell(row, j_tmp)
-                    if (! moveList.contains(cell))
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -322,7 +303,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 }
                 if (j_tmp > column + 1 && i_tmp > row + 1) {
                     val cell = Cell(i_tmp, j_tmp)
-                    if (! moveList.contains(cell))
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -347,7 +328,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 }
                 if (i_tmp > row + 1) {
                     val cell = Cell(i_tmp, column)
-                    if (! moveList.contains(cell))
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -378,7 +359,7 @@ class BoardManager(val eventListener: BoardEventListener) {
                 }
                 if (j_tmp < column - 1 && i_tmp > row + 1) {
                     val cell = Cell(i_tmp, j_tmp)
-                    if (! moveList.contains(cell))
+                    if (!moveList.contains(cell))
                         moveList.add(cell)
                 }
                 return
@@ -394,18 +375,18 @@ class BoardManager(val eventListener: BoardEventListener) {
 
 
     // returns cells to be flipped out if a move happen with respect to turn
-    fun flipCellsAfterMove(x: Int, y: Int): List<Cell> {
+    private fun flipCellsAfterMove(x: Int, y: Int): List<Cell> {
         val list: ArrayList<Cell> = ArrayList()
 
         // check top
         if (x != 0 && board[x - 1][y] != null) { // check if item is not on edge and next cell in that direction is not empty
             var xOffset = x // first disk with same color in top direction
             for (i in x - 1 downTo 0)
-                if (!indicesOkay(i,y) || board[i][y] == null) break
+                if (!indicesOkay(i, y) || board[i][y] == null) break
                 else if (board[x][y] == board[i][y]) { // check for the first cell with same side
-                xOffset = i
-                break
-            }
+                    xOffset = i
+                    break
+                }
 
             if (xOffset != x) for (newX in x - 1 downTo xOffset + 1) list.add(Cell(newX, y))
 
@@ -416,24 +397,24 @@ class BoardManager(val eventListener: BoardEventListener) {
         if (x != 0 && y != boardSize - 1 && board[x - 1][y + 1] != null) {
             var xOffset = x
             for (i in x - 1 downTo 0)
-                if (!indicesOkay(i,y + (x - i)) || board[i][y + (x - i)] == null) break
+                if (!indicesOkay(i, y + (x - i)) || board[i][y + (x - i)] == null) break
                 else if (board[x][y] == board[i][y + (x - i)]) {// row decrement, column increment
-                xOffset = i
-                break
-            }
+                    xOffset = i
+                    break
+                }
 
             if (xOffset != x) for (newX in x - 1 downTo xOffset + 1) list.add(Cell(newX, y + (x - newX)))
         }
 
         // check right
-        if (y != boardSize-1 && board[x][y + 1] != null) {
+        if (y != boardSize - 1 && board[x][y + 1] != null) {
             var yOffset = y
             for (i in y + 1 until boardSize)
-                if (!indicesOkay(x,i) || board[x][i] == null) break
+                if (!indicesOkay(x, i) || board[x][i] == null) break
                 else if (board[x][y] == board[x][i]) {// row no change, column increment
-                yOffset = i
-                break
-            }
+                    yOffset = i
+                    break
+                }
 
             if (yOffset != y) for (newY in y + 1 until yOffset) list.add(Cell(x, newY))
         }
@@ -442,11 +423,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         if (x != boardSize - 1 && y != boardSize - 1 && board[x + 1][y + 1] != null) {
             var xOffset = x
             for (i in x + 1 until boardSize)
-                if (!indicesOkay(i,y + (i-x)) || board[i][y + (i - x)] == null) break
+                if (!indicesOkay(i, y + (i - x)) || board[i][y + (i - x)] == null) break
                 else if (board[x][y] == board[i][y + (i - x)]) {// row increment, column increment
-                xOffset = i
-                break
-            }
+                    xOffset = i
+                    break
+                }
 
             if (xOffset != x) for (newX in x + 1 until xOffset) list.add(Cell(newX, y + (newX - x)))
         }
@@ -455,11 +436,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         if (x != boardSize - 1 && board[x + 1][y] != null) {
             var xOffset = x
             for (i in x + 1 until boardSize)
-                if (!indicesOkay(i,y) || board[i][y] == null) break
+                if (!indicesOkay(i, y) || board[i][y] == null) break
                 else if (board[x][y] == board[i][y]) { // check for the first cell with same side
-                xOffset = i
-                break
-            }
+                    xOffset = i
+                    break
+                }
 
             if (xOffset != x) for (newX in x + 1 until xOffset) list.add(Cell(newX, y))
 
@@ -469,11 +450,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         if (x != boardSize - 1 && y != 0 && board[x + 1][y - 1] != null) {
             var xOffset = x
             for (i in x + 1 until boardSize)
-                if (!indicesOkay(i,y - (i - x)) || board[i][y - (i - x)] == null) break
+                if (!indicesOkay(i, y - (i - x)) || board[i][y - (i - x)] == null) break
                 else if (board[x][y] == board[i][y - (i - x)]) {// row increment, column decrement
-                xOffset = i
-                break
-            }
+                    xOffset = i
+                    break
+                }
 
             if (xOffset != x) for (newX in x + 1 until xOffset) list.add(Cell(newX, y - (newX - x)))
         }
@@ -482,11 +463,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         if (y != 0 && board[x][y - 1] != null) {
             var yOffset = y
             for (i in y - 1 downTo 0)
-                if (!indicesOkay(x,i) || board[x][i] == null) break
+                if (!indicesOkay(x, i) || board[x][i] == null) break
                 else if (board[x][y] == board[x][i]) {// row no change, column decrement
-                yOffset = i
-                break
-            }
+                    yOffset = i
+                    break
+                }
 
             if (yOffset != y) for (newY in y - 1 downTo yOffset + 1) list.add(Cell(x, newY))
         }
@@ -495,11 +476,11 @@ class BoardManager(val eventListener: BoardEventListener) {
         if (x != 0 && y != 0 && board[x - 1][y - 1] != null) {
             var xOffset = x
             for (i in x - 1 downTo 0)
-                if (!indicesOkay(i,y - (x - i)) || board[i][y - (x - i)] == null) break
+                if (!indicesOkay(i, y - (x - i)) || board[i][y - (x - i)] == null) break
                 else if (board[x][y] == board[i][y - (x - i)]) {// row increment, column increment
-                xOffset = i
-                break
-            }
+                    xOffset = i
+                    break
+                }
 
             if (xOffset != x) for (newX in x - 1 downTo xOffset + 1) list.add(Cell(newX, y - (x - newX)))
         }
@@ -508,7 +489,7 @@ class BoardManager(val eventListener: BoardEventListener) {
     }
 
     // return a boolean indicating whether game is finished
-    fun isGameFinished(): Boolean {
+    private fun isGameFinished(): Boolean {
         var black = 0
         var white = 0
 
@@ -519,7 +500,7 @@ class BoardManager(val eventListener: BoardEventListener) {
 
         blackDisksCount = black
         whiteDisksCount = white
-        return (black+white) == (boardSize*boardSize)
+        return (black + white) == (boardSize * boardSize)
     }
 
     fun printBoard() {
@@ -537,23 +518,23 @@ class BoardManager(val eventListener: BoardEventListener) {
         println("===========================")
     }
 
-    fun getWinner(): Side? {
+    private fun getWinner(): Side? {
         return if (blackDisksCount > whiteDisksCount) Side.BLACK else if (whiteDisksCount > blackDisksCount) Side.WHITE else null
     }
 
-    fun indicesOkay(x: Int, y: Int): Boolean {
+    private fun indicesOkay(x: Int, y: Int): Boolean {
         return x in 0 until boardSize && y in 0 until boardSize
     }
 
     fun printBoardWithAvailableCells(availableCells: List<Cell>) {
         val copy: Array<Array<String?>> = Array(boardSize) { arrayOfNulls(boardSize) }
 
-        board.forEachIndexed {x, row ->
-            row.forEachIndexed{y, side ->
+        board.forEachIndexed { x, row ->
+            row.forEachIndexed { y, side ->
                 copy[x][y] = if (side == null) "   " else if (side == Side.BLACK) " B " else " W "
             }
         }
-        availableCells.forEach { copy[it.x][it.y] =  " . "}
+        availableCells.forEach { copy[it.x][it.y] = " . " }
 
         println("===========================")
         print("   ")
@@ -570,6 +551,6 @@ class BoardManager(val eventListener: BoardEventListener) {
     }
 
     fun printScores() {
-        println( "Black : $blackDisksCount     White : $whiteDisksCount")
+        println("Black : $blackDisksCount     White : $whiteDisksCount")
     }
 }
