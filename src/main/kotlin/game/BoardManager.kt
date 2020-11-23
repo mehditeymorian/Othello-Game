@@ -526,7 +526,7 @@ class BoardManager(val eventListener: BoardEventListener) {
     }
 
     fun indicesOkay(x: Int, y: Int): Boolean {
-        return x < boardSize && y < boardSize
+        return x in 0 until boardSize && y in 0 until boardSize
     }
 
     fun printBoardWithAvailableCells(availableCells: List<Cell>) {
