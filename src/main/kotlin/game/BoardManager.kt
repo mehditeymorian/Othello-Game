@@ -45,12 +45,19 @@ class BoardManager(private val eventListener: BoardEventListener) {
         }
 
         turn = turn.flip()
-        val list = availableCells()
+        var list = availableCells()
         if (list.isEmpty()) { // no move possible
+            println("No legal move for $turn")
             turn = turn.flip()
-            eventListener.makeMove(turn, availableCells())
-        } else eventListener.makeMove(turn, list)
+            list = availableCells()
+        }
 
+        if (list.isEmpty()) {
+            eventListener.onGameFinish(getWinner())
+            return
+        }
+
+        eventListener.makeMove(turn, list)
 
     }
 
