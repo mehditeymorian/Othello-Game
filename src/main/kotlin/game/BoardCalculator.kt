@@ -473,4 +473,8 @@ class BoardCalculator {
         this.whiteDisks = white
         return (black + white) == (boardSize * boardSize)
     }
+
+    fun getWinner(): Side? {
+        return if (blackDisks > whiteDisks) Side.BLACK else if (whiteDisks > blackDisks) Side.WHITE else null
+    }
 }

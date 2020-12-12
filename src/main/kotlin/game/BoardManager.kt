@@ -44,7 +44,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
         blackDisks = calculator.blackDisks
         whiteDisks = calculator.whiteDisks
         if (isGameFinished) {
-            eventListener.onGameFinish(getWinner())
+            eventListener.onGameFinish(calculator.getWinner())
             return
         }
 
@@ -57,7 +57,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
         }
 
         if (list.isEmpty()) {
-            eventListener.onGameFinish(getWinner())
+            eventListener.onGameFinish(calculator.getWinner())
             return
         }
 
@@ -80,9 +80,6 @@ class BoardManager(private val eventListener: BoardEventListener) {
         println("===========================")
     }
 
-    private fun getWinner(): Side? {
-        return if (blackDisks > whiteDisks) Side.BLACK else if (whiteDisks > blackDisks) Side.WHITE else null
-    }
 
     fun printBoardWithAvailableCells(availableCells: List<Cell>) {
         val copy: Array<Array<String?>> = Array(calculator.boardSize) { arrayOfNulls(calculator.boardSize) }
