@@ -5,8 +5,6 @@ class BoardManager(private val eventListener: BoardEventListener) {
     var board: Array<Array<Side?>> = Array(calculator.boardSize) { arrayOfNulls(calculator.boardSize) }
     var turn: Side = Side.BLACK
 
-    var blackDisks = 0
-    var whiteDisks = 0
 
 
     fun initBoard() {
@@ -18,8 +16,8 @@ class BoardManager(private val eventListener: BoardEventListener) {
         board[3][4] = Side.BLACK
         board[4][3] = Side.BLACK
         board[4][4] = Side.WHITE
-        blackDisks = 2
-        whiteDisks = 2
+        calculator.blackDisks = 2
+        calculator.whiteDisks = 2
 
     }
 
@@ -40,10 +38,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
         board[x][y] = turn // put disk
         calculator.flipCellsAfterMove(board,Cell(x, y)).forEach { board[it.x][it.y] = board[it.x][it.y]?.flip() } // flip disks
-        val isGameFinished = calculator.isGameFinished(board)
-        blackDisks = calculator.blackDisks
-        whiteDisks = calculator.whiteDisks
-        if (isGameFinished) {
+        if (calculator.isGameFinished(board)) {
             eventListener.onGameFinish(calculator.getWinner())
             return
         }
@@ -106,6 +101,6 @@ class BoardManager(private val eventListener: BoardEventListener) {
     }
 
     fun printScores() {
-        println("Black : $blackDisks     White : $whiteDisks")
+        println("Black : ${calculator.blackDisks}     White : ${calculator.whiteDisks}")
     }
 }
