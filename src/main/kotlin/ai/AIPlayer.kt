@@ -9,34 +9,49 @@ class AIPlayer {
     // Aplha and Beta
     var MAX = 1000
     var MIN = -1000
-
+    var depthCount : Int = 0
 
     fun search(state: Array<Array<Side>>): Cell {
         return Cell(0, 0)
     }
 
     fun maxValue(state: Array<Array<Side?>>, a: Int, b: Int, depth: Int): Int {
+        if (isInTerminalState(state) || depth == depthCount){
+            return getUtility(state)
+        }
+        depthCount++
         var boardCalculator = BoardCalculator()
         var boardManager = BoardManager(Game())
 
-        if (isInTerminalState(state) ){
-            return getUtility(state)
-        }
         var maxValue = MIN
-        var maxMove : Cell
         val availableMoves =boardCalculator.availableCells(state , Side.BLACK)
         availableMoves.forEach{
             boardManager.putDisk(it.x , it.y , availableMoves)
             if (maxValue < minValue(state , a , b , depth)){
                 maxValue = minValue(state, a , b , depth)
-                maxMove = it
             }
         }
         return maxValue
     }
 
     fun minValue(state: Array<Array<Side?>>, a: Int, b: Int, depth: Int): Int {
-        return 0
+
+        if (isInTerminalState(state) || depth == depthCount){
+            return getUtility(state)
+        }
+        depthCount++
+        var boardCalculator = BoardCalculator()
+        var boardManager = BoardManager(Game())
+
+        var minValue = MAX
+        val availableMoves =boardCalculator.availableCells(state , Side.WHITE)
+        availableMoves.forEach{
+            boardManager.putDisk(it.x , it.y , availableMoves)
+            if (minValue > maxValue(state , a , b , depth)){
+                minValue = maxValue(state, a , b , depth)
+            }
+        }
+        return minValue
     }
 
     fun isInTerminalState(state: Array<Array<Side?>>): Boolean {
