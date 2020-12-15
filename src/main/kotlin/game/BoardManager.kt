@@ -37,7 +37,9 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
 
         board[x][y] = turn // put disk
-        calculator.flipCellsAfterMove(board,Cell(x, y)).forEach { board[it.x][it.y] = board[it.x][it.y]?.flip() } // flip disks
+        calculator.flipCellsAfterMove(board,Cell(x, y)).forEach {
+            board[it.x][it.y] = board[it.x][it.y]?.flip()
+        } // flip disks
         if (calculator.isGameFinished(board)) {
             eventListener.onGameFinish(calculator.getWinner())
             return

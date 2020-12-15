@@ -6,73 +6,73 @@ class BoardCalculator {
     var whiteDisks: Int = 0
 
     // returns available cells to make a move with respect to turn
-    fun availableCells(board: Array<Array<Side?>>, turn: Side): ArrayList<Cell> {
+    fun availableCells(state: Array<Array<Side?>>, turn: Side): ArrayList<Cell> {
         val moveList: ArrayList<Cell> = ArrayList()
 
         for (i in 0..7) {
             for (j in 0..7) {
-                if (board[i][j] != null && turn == board[i][j]) {   // identify homes that have same color as turn color
+                if (state[i][j] != null && turn == state[i][j]) {   // identify homes that have same color as turn color
 
                     //---------------------------------------- gooshe ha
                     if (i == 0 && j == 0) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_down")
                     }
                     if (i == 0 && j == 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_down")
                     }
                     if (i == 7 && j == 0) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_up")
                     }
                     if (i == 7 && j == 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_up")
                     }
                     //--------------------------------------- divare ha
                     if (j == 0 && 0 < i && i < 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "down")
                     }
                     if (j == 7 && 0 < i && i < 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "down")
                     }
                     if (i == 0 && 0 < j && j < 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right")
                     }
                     if (i == 7 && 0 < j && j < 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right")
                     }
                     //---------------------------------------- khoone haie dakheli
                     if (0 < i && i < 7 && 0 < j && j < 7) {
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_up")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "right_down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "down")
-                        identifyOpponent(board, turn, moveList, Cell(i, j), "left_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_up")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "right_down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "down")
+                        identifyOpponent(state, turn, moveList, Cell(i, j), "left_down")
                     }
                 }
             }
