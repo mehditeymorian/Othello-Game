@@ -8,7 +8,6 @@ class AIPlayer {
 
     private val boardCalculator = BoardCalculator()
     private lateinit var boardManager :  BoardManager
-    private lateinit var boardCopy : Array<Array<Side?>>
     private lateinit var AITurn :Side
     private var defaultDepth : Int = 0
     private var depthCount : Int = 0
@@ -17,20 +16,18 @@ class AIPlayer {
 
 
     fun search(state: Array<Array<Side?>>): Cell {
+
         AITurn = Side.BLACK
-        //defaultDepth = 6
         var bestScore = MIN
         lateinit var bestMove : Cell
+        var boundary : Array<Int> = arrayOf(MAX ,MIN)
 
         val availableMoves =boardCalculator.availableCells(state , AITurn)
         availableMoves.forEach {
-            copyBoard(state)
-            boardManager = BoardManager(Game())
-            boardManager.board = getCopyBoard()
-            boardManager.turn = AITurn
-            boardManager.putDisk(it.x , it.y , availableMoves)
 
-            val moveScore = minValue(state , MIN , MAX , defaultDepth)
+            var boardCopy = copyBoard(state)
+            boardCopy[it.x][it.y] = AITurn
+            val moveScore = minValue(boardCopy , boundary , defaultDepth)
             if(bestScore<moveScore){
                 bestScore = moveScore
                 bestMove=it
@@ -40,7 +37,7 @@ class AIPlayer {
         return bestMove
     }
 
-    fun maxValue(state: Array<Array<Side?>>, a: Int, b: Int, depth: Int): Int {
+    fun maxValue(state: Array<Array<Side?>>, boundary: Array<Int>, depth: Int): Int {
 
         if (isInTerminalState(state) || depth == this.depthCount){
             return getUtility(state)
@@ -50,22 +47,22 @@ class AIPlayer {
         var v = MIN
         val availableMoves =boardCalculator.availableCells(state , Side.BLACK)
         availableMoves.forEach{
-            copyBoard(state)
-            boardManager = BoardManager(Game())
-            boardManager.board = getCopyBoard()
-            boardManager.turn = AITurn
+
+            var boardCopy = copyBoard(state)
+            boardCopy[it.x][it.y] = AITurn
+
             boardManager.putDisk(it.x , it.y , availableMoves)
-            val minVal = minValue(state , a , b , depth)
+            val minVal = minValue(boardCopy ,boundary , depth)
             v = max(v , minVal)
-            a = max(a , v)//????
-            if (a >= b){
+            boundary[0] = max(boundary[0] , v)//????
+            if (boundary[0] >= boundary[1]){
                 return v
             }
         }
         return v
     }
 
-    fun minValue(state: Array<Array<Side?>>, a: Int, b: Int, depth: Int): Int {
+    fun minValue(state: Array<Array<Side?>>, boundary: Array<Int>, depth: Int): Int {
         var Opponent : Side = Side.BLACK
         if (AITurn == Side.BLACK){
             Opponent = Side.WHITE
@@ -79,17 +76,16 @@ class AIPlayer {
         val availableMoves =boardCalculator.availableCells(state , Opponent)
         availableMoves.forEach{
 
-            copyBoard(state)
-            boardManager = BoardManager(Game())
-            boardManager.board = getCopyBoard()
-            boardManager.turn = AITurn
-            boardManager.putDisk(it.x , it.y , availableMoves)
-            val maxVal = maxValue(state , a , b , depth)
+
+            var boardCopy = copyBoard(state)
+            boardCopy[it.x][it.y] = Opponent
+
+            val maxVal = maxValue(boardCopy , boundary , depth)
             v = min(v , maxVal)
-            if (b <= a){
+            if (boundary[1] <= boundary[0]){
                 return v
             }
-            b = min(b , v)//????
+            boundary[1] = min(boundary[1] , v)
         }
         return v
     }
@@ -109,9 +105,6 @@ class AIPlayer {
         return 0
     }
 
-    fun getCopyBoard(): Array<Array<Side?>>{
-        return boardCopy
-    }
 
     fun copyBoard( state :  Array<Array<Side?>>): Array<Array<Side?>>{
         var board: Array<Array<Side?>> = Array(boardCalculator.boardSize) { arrayOfNulls(boardCalculator.boardSize) }
