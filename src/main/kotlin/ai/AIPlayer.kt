@@ -19,11 +19,12 @@ class AIPlayer(turn: Side) : Player(turn) {
         var bestMove = availableCells[0]
         var bestPoint = boundary[1]
         availableCells.forEach {
-
+            depthCount = 0 ;
             val currentPoint = minValue(boardCalculator.copy(state) , boundary , it , turn)
             if (currentPoint > bestPoint) {
                 bestMove = it
                 bestPoint = currentPoint
+                println(" best move : ${bestMove.x} , ${bestMove.y}     || best point : $bestPoint")
             }
         }
         return bestMove
@@ -55,6 +56,7 @@ class AIPlayer(turn: Side) : Player(turn) {
 
             val minVal = minValue(boardCalculator.copy(state), boundary, it, Opponent)
             v = max(v, minVal)
+            println("MaxValue => DepthCount : $depthCount    || minVal : $minVal    || v : $v")
 
             if (v >= boundary[1]) {
                 return v
@@ -88,6 +90,8 @@ class AIPlayer(turn: Side) : Player(turn) {
 
             val maxVal = maxValue(boardCalculator.copy(state), boundary, it , Opponent)
             v = min(v, maxVal)
+            println("MinValue => DepthCount : $depthCount    || maxVal : $maxVal    || v : $v")
+
             if (v <= boundary[0]) {
                 return v
             }
