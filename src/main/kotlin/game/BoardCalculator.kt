@@ -1,7 +1,7 @@
 package game
 
+const val BOARD_SIZE = 8
 class BoardCalculator {
-    val boardSize = 8
     var blackDisks: Int = 0
     var whiteDisks: Int = 0
 
@@ -350,7 +350,7 @@ class BoardCalculator {
 
 
         // check top right
-        if (cell.x != 0 && cell.y != boardSize - 1 && state[cell.x - 1][cell.y + 1] != null) {
+        if (cell.x != 0 && cell.y != BOARD_SIZE - 1 && state[cell.x - 1][cell.y + 1] != null) {
             var xOffset = cell.x
             for (i in cell.x - 1 downTo 0)
                 if (!indicesOkay(i, cell.y + (cell.x - i)) || state[i][cell.y + (cell.x - i)] == null) break
@@ -368,9 +368,9 @@ class BoardCalculator {
         }
 
         // check right
-        if (cell.y != boardSize - 1 && state[cell.x][cell.y + 1] != null) {
+        if (cell.y != BOARD_SIZE - 1 && state[cell.x][cell.y + 1] != null) {
             var yOffset = cell.y
-            for (i in cell.y + 1 until boardSize)
+            for (i in cell.y + 1 until BOARD_SIZE)
                 if (!indicesOkay(cell.x, i) || state[cell.x][i] == null) break
                 else if (state[cell.x][cell.y] == state[cell.x][i]) {// row no change, column increment
                     yOffset = i
@@ -381,9 +381,9 @@ class BoardCalculator {
         }
 
         // check bottom right
-        if (cell.x != boardSize - 1 && cell.y != boardSize - 1 && state[cell.x + 1][cell.y + 1] != null) {
+        if (cell.x != BOARD_SIZE - 1 && cell.y != BOARD_SIZE - 1 && state[cell.x + 1][cell.y + 1] != null) {
             var xOffset = cell.x
-            for (i in cell.x + 1 until boardSize)
+            for (i in cell.x + 1 until BOARD_SIZE)
                 if (!indicesOkay(i, cell.y + (i - cell.x)) || state[i][cell.y + (i - cell.x)] == null) break
                 else if (state[cell.x][cell.y] == state[i][cell.y + (i - cell.x)]) {// row increment, column increment
                     xOffset = i
@@ -394,9 +394,9 @@ class BoardCalculator {
         }
 
         // check bottom
-        if (cell.x != boardSize - 1 && state[cell.x + 1][cell.y] != null) {
+        if (cell.x != BOARD_SIZE - 1 && state[cell.x + 1][cell.y] != null) {
             var xOffset = cell.x
-            for (i in cell.x + 1 until boardSize)
+            for (i in cell.x + 1 until BOARD_SIZE)
                 if (!indicesOkay(i, cell.y) || state[i][cell.y] == null) break
                 else if (state[cell.x][cell.y] == state[i][cell.y]) { // check for the first cell with same side
                     xOffset = i
@@ -408,9 +408,9 @@ class BoardCalculator {
         }
 
         // check bottom left
-        if (cell.x != boardSize - 1 && cell.y != 0 && state[cell.x + 1][cell.y - 1] != null) {
+        if (cell.x != BOARD_SIZE - 1 && cell.y != 0 && state[cell.x + 1][cell.y - 1] != null) {
             var xOffset = cell.x
-            for (i in cell.x + 1 until boardSize)
+            for (i in cell.x + 1 until BOARD_SIZE)
                 if (!indicesOkay(i, cell.y - (i - cell.x)) || state[i][cell.y - (i - cell.x)] == null) break
                 else if (state[cell.x][cell.y] == state[i][cell.y - (i - cell.x)]) {// row increment, column decrement
                     xOffset = i
@@ -455,7 +455,7 @@ class BoardCalculator {
     }
 
     private fun indicesOkay(x: Int, y: Int): Boolean {
-        return x in 0 until boardSize && y in 0 until boardSize
+        return x in 0 until BOARD_SIZE && y in 0 until BOARD_SIZE
     }
 
 
@@ -471,7 +471,7 @@ class BoardCalculator {
 
         this.blackDisks = black
         this.whiteDisks = white
-        return (black + white) == (boardSize * boardSize)
+        return (black + white) == (BOARD_SIZE * BOARD_SIZE)
     }
 
     fun getWinner(): Side? {
@@ -479,7 +479,7 @@ class BoardCalculator {
     }
 
     fun copy(state :  Array<Array<Side?>>): Array<Array<Side?>>{
-        val board: Array<Array<Side?>> = Array(boardSize) { arrayOfNulls(boardSize) }
+        val board: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
         for (x in board.indices) for (y in board.indices) {
             val side = state[x][y]
             board[x][y] = side
