@@ -39,14 +39,14 @@ class AIPlayer(turn: Side) : Player(turn) {
         turn_max: Side
     ): Double {
 
-        var Opponent: Side = Side.BLACK
-        if (turn_max == Side.BLACK) {
-            Opponent = Side.WHITE
-        }
+        var Opponent: Side = turn_max.flip()
 
         state[cell.x][cell.y] = turn_max
+
         if (isInTerminalState(state) || searchDepth == depthCount) {
-            return utilityCalculator.calculate(state,cell,turn_max )
+            var u = utilityCalculator.calculate(state,cell,turn_max )
+            println("MaxValue => DepthCount : $depthCount    || utility :  $u")
+            return u
         }
 
         this.depthCount++
@@ -56,7 +56,6 @@ class AIPlayer(turn: Side) : Player(turn) {
 
             val minVal = minValue(boardCalculator.copy(state), boundary, it, Opponent)
             v = max(v, minVal)
-            println("MaxValue => DepthCount : $depthCount    || minVal : $minVal    || v : $v")
 
             if (v >= boundary[1]) {
                 return v
@@ -73,14 +72,13 @@ class AIPlayer(turn: Side) : Player(turn) {
         turn_min: Side
     ): Double {
 
-        var Opponent: Side = Side.BLACK
-        if (turn_min == Side.BLACK) {
-            Opponent = Side.WHITE
-        }
+        var Opponent: Side = turn_min.flip()
 
         state[cell.x][cell.y] = turn_min
         if (isInTerminalState(state) || searchDepth == depthCount) {
-            return utilityCalculator.calculate(state,cell,turn_min )
+            var u = utilityCalculator.calculate(state,cell,turn_min )
+            println("MinValue => DepthCount : $depthCount    || utility :  $u")
+            return u
         }
         this.depthCount++
 
@@ -90,7 +88,7 @@ class AIPlayer(turn: Side) : Player(turn) {
 
             val maxVal = maxValue(boardCalculator.copy(state), boundary, it , Opponent)
             v = min(v, maxVal)
-            println("MinValue => DepthCount : $depthCount    || maxVal : $maxVal    || v : $v")
+
 
             if (v <= boundary[0]) {
                 return v
