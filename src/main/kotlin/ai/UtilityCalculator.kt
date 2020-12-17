@@ -10,7 +10,7 @@ const val MAX_MOBILITY = 20.0
 const val MAX_DISTANCE_TO_CORNER = 5.0
 const val MAX_DISTANCE_TO_EDGE = 7.0
 const val MAX_FLIP = 18.0
-const val FEATURES_COUNT = 6
+const val FEATURES_COUNT = 7
 
 class UtilityCalculator(private val calculator: BoardCalculator, private val weights: DoubleArray) {
     private val corners = cornerCells()
@@ -30,7 +30,8 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
                 weights[2] * maxFlipFeature(state, cell, side) +
                 weights[3] * unflipableDisksFeature(state) +
                 weights[4] * mobilityFeature(state, cell, side) +
-                weights[5] * dangerCellsFeature(state, cell, side)
+                weights[5] * dangerCellsFeature(state, cell, side) +
+                weights[6] * wedgingFeature(state,cell,side)
     }
 
     /* calculate distance to nearest corner
