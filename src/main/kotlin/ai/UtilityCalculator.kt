@@ -25,7 +25,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
 //            mobilityFeature(state, cell, side),
 //            dangerCellsFeature(state, cell, side)
 //        )
-        return  weights[0] * cornerFeature(cell) +
+        return weights[0] * cornerFeature(cell) +
                 weights[1] * edgeFeature(cell) +
                 weights[2] * maxFlipFeature(state, cell, side) +
                 weights[3] * unflipableDisksFeature(state) +
@@ -38,7 +38,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     */
     private fun cornerFeature(cell: Cell): Double {
         val (_, distance) = nearestCornerTo(cell)
-        return (MAX_DISTANCE_TO_CORNER - distance)/ MAX_DISTANCE_TO_CORNER
+        return (MAX_DISTANCE_TO_CORNER - distance) / MAX_DISTANCE_TO_CORNER
     }
 
     /* calculate distance to nearest cell
@@ -58,7 +58,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
             if (manhattanDistance < minDistance) minDistance = manhattanDistance
         }
 
-        return (MAX_DISTANCE_TO_EDGE - minDistance)/ MAX_DISTANCE_TO_EDGE
+        return (MAX_DISTANCE_TO_EDGE - minDistance) / MAX_DISTANCE_TO_EDGE
     }
 
     /* if has a corner calculate number of cell that flips after this move
@@ -68,7 +68,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         return if (hasCorner(state, turn)) {
             val copy = calculator.copy(state)
             copy[cell.x][cell.y] = turn
-            calculator.flipCellsAfterMove(copy, cell).size/ MAX_FLIP
+            calculator.flipCellsAfterMove(copy, cell).size / MAX_FLIP
         } else 0.0
     }
 
@@ -82,8 +82,11 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
         val copy = calculator.copy(state)
         copy[cell.x][cell.y] = turn
+        calculator.flipCellsAfterMove(copy,cell).forEach {
+            copy[it.x][it.y] = copy[it.x][it.y]?.flip()
+        }
         val opponentMoves = calculator.availableCells(copy, turn.flip()).size
-        return (MAX_MOBILITY - opponentMoves)/ MAX_MOBILITY
+        return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
     }
 
     /* being in the C cells
@@ -96,7 +99,21 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         //      if has corner 1
         //      else -1
         // not in dangerCell 0
-        return if (cell in dangerCells) if (hasCorner(state,turn)) 1 else -1 else 0
+        return if (cell in dangerCells) if (hasCorner(state, turn)) 1 else -1 else 0
+    }
+
+    private fun wedgingFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+        val opponentSide = turn.flip()
+        if (cell.x == 0 || cell.x == BOARD_SIZE - 1) {// in top or bottom edge
+            val neighbors = listOf(state.getOrNull(cell.x, cell.y - 1), state.getOrNull(cell.x, cell.y + 1))
+            if (isWedge(neighbors, opponentSide)) return 1.0
+
+        } else if (cell.y == 0 || cell.y == BOARD_SIZE - 1) { // in left or right edge
+            val neighbors = listOf(state.getOrNull(cell.x - 1, cell.y), state.getOrNull(cell.x + 1, cell.y))
+            if (isWedge(neighbors, opponentSide)) return 1.0
+        }
+
+        return 0.0
     }
 
     private fun manhattanDistance(c1: Cell, c2: Cell): Int {
@@ -163,5 +180,12 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         )
     }
 
+    private fun isWedge(neighbors: List<Side?>, side: Side): Boolean {
+        return neighbors.filterNotNull().filter { it == side }.size == 2
+    }
+
+    private fun Array<Array<Side?>>.getOrNull(x: Int, y: Int): Side? {
+        return this.getOrNull(x)?.get(y)
+    }
 
 }
