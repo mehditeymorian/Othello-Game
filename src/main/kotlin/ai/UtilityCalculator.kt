@@ -100,7 +100,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         //      if has corner 1
         //      else -1
         // not in dangerCell 0
-        return if (cell in dangerCells) if (hasCorner(state, turn)) 1 else -1 else 0
+        return if (cell in dangerCells) if (turn == state.getOrNull(corner.x,corner.y)) 1 else -1 else 0
     }
 
     private fun wedgingFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
