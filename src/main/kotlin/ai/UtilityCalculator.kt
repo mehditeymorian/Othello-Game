@@ -9,6 +9,7 @@ const val MAX_MOBILITY = 20.0
 const val MAX_DISTANCE_TO_CORNER = 5.0
 const val MAX_DISTANCE_TO_EDGE = 7.0
 const val MAX_FLIP = 18.0
+const val FEATURES_COUNT = 6
 
 class UtilityCalculator(private val calculator: BoardCalculator, private val weights: DoubleArray) {
     private val corners = cornerCells()
