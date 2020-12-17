@@ -1,6 +1,6 @@
 package game
 
-class Game : BoardEventListener {
+class Game(private val player1: Player, private val player2: Player) : BoardEventListener {
     private val boardManager = BoardManager(this)
 
 
@@ -23,16 +23,10 @@ class Game : BoardEventListener {
         boardManager.printBoardWithAvailableCells(availableCells)
         boardManager.printScores()
         print("${turn.name} Move:")
-        val line = readLine()?.split(" ")
-        if (line == null) {
-            println("Wrong Input, try again")
-            makeMove(turn, availableCells)
-        } else {
-            val x = line[0].toInt()
-            val y = line[1].toInt()
-            boardManager.putDisk(x, y, availableCells)
+        val move = if (turn == player1.turn) player1.move(boardManager.board,availableCells)
+        else player2.move(boardManager.board,availableCells)
+        boardManager.putDisk(move.x, move.y, availableCells)
 
-        }
 
     }
 }
