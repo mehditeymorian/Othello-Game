@@ -104,6 +104,60 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
 
     private fun wedgingFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
         val opponentSide = turn.flip()
+
+        when (cell) {
+            Cell(0, 1) -> { // top left corner
+                if (state.getOrNull(0,0) == null && state.getOrNull(0,2) == opponentSide)
+                    return -1.0
+            }
+            Cell(1, 1) -> { // top left corner
+                if (state.getOrNull(0,0) == null && state.getOrNull(2,2) == opponentSide)
+                    return -1.0
+            }
+            Cell(1, 0) -> { // top left corner
+                if (state.getOrNull(0,0) == null && state.getOrNull(2,0) == opponentSide)
+                    return -1.0
+            }
+            Cell(0, 6)->{ // top right corner
+                if (state.getOrNull(BOARD_SIZE-1,BOARD_SIZE-1) == null && state.getOrNull(0,5) == opponentSide)
+                    return -1.0
+            }
+            Cell(1, 6)->{ // top right corner
+                if (state.getOrNull(BOARD_SIZE-1,BOARD_SIZE-1) == null && state.getOrNull(2,5) == opponentSide)
+                    return -1.0
+            }
+            Cell(1, 7)->{ // top right corner
+                if (state.getOrNull(BOARD_SIZE-1,BOARD_SIZE-1) == null && state.getOrNull(2,7) == opponentSide)
+                    return -1.0
+            }
+            Cell(6, 0)->{ // bottom left corner
+                if (state.getOrNull(7,0) == null && state.getOrNull(5,0) == opponentSide)
+                    return -1.0
+            }
+            Cell(6, 1)->{ // bottom left corner
+                if (state.getOrNull(7,0) == null && state.getOrNull(5,2) == opponentSide)
+                    return -1.0
+            }
+            Cell(7, 1)->{ // bottom left corner
+                if (state.getOrNull(7,0) == null && state.getOrNull(7,2) == opponentSide)
+                    return -1.0
+            }
+            Cell(6, 6)->{ // bottom right corner
+                if (state.getOrNull(7,7) == null && state.getOrNull(5,5) == opponentSide)
+                    return -1.0
+            }
+            Cell(6, 7)->{ // bottom right corner
+                if (state.getOrNull(7,7) == null && state.getOrNull(5,7) == opponentSide)
+                    return -1.0
+            }
+            Cell(7, 6)->{ // bottom right corner
+                if (state.getOrNull(7,7) == null && state.getOrNull(7,5) == opponentSide)
+                    return -1.0
+            }
+        }
+
+
+
         if (cell.x == 0 || cell.x == BOARD_SIZE - 1) {// in top or bottom edge
             val neighbors = listOf(state.getOrNull(cell.x, cell.y - 1), state.getOrNull(cell.x, cell.y + 1))
             if (isWedge(neighbors, opponentSide)) return 1.0
