@@ -8,25 +8,39 @@ class AIPlayer(turn: Side) : Player(turn) {
     private val boardCalculator = BoardCalculator()
     private val featureWeights = DoubleArray(FEATURES_COUNT) { 1.0 }
     private val utilityCalculator = UtilityCalculator(boardCalculator, featureWeights)
-    private var searchDepth: Int = 10
+    private var searchDepth: Int = 20
     private var depthCount: Int = 0
+
+//    init {
+//        featureWeights[5] = 5.0
+//    }
 
 
 
     override fun move(state: Array<Array<Side?>>, availableCells: List<Cell>): Cell {
 
-        var boundary: Array<Double> = arrayOf(Double.MAX_VALUE, Double.MIN_VALUE)
         var bestMove = availableCells[0]
-        var bestPoint = boundary[1]
+        var bestPoint = Double.MIN_VALUE
         availableCells.forEach {
-            depthCount = 0 ;
-            val currentPoint = minValue(boardCalculator.copy(state) , boundary , it , turn)
-            if (currentPoint > bestPoint) {
+            val utility = utilityCalculator.calculate(state, it, turn)
+            if (utility > bestPoint) {
                 bestMove = it
-                bestPoint = currentPoint
-                println(" best move : ${bestMove.x} , ${bestMove.y}     || best point : $bestPoint")
+                bestPoint = utility
             }
         }
+
+//        var boundary: Array<Double> = arrayOf(Double.MAX_VALUE, Double.MIN_VALUE)
+//        var bestMove = availableCells[0]
+//        var bestPoint = boundary[1]
+//        availableCells.forEach {
+//            depthCount = 0 ;
+//            val currentPoint = minValue(boardCalculator.copy(state) , boundary , it , turn)
+//            if (currentPoint > bestPoint) {
+//                bestMove = it
+//                bestPoint = currentPoint
+//                println(" best move : ${bestMove.x} , ${bestMove.y}     || best point : $bestPoint")
+//            }
+//        }
         return bestMove
     }
 
@@ -45,7 +59,7 @@ class AIPlayer(turn: Side) : Player(turn) {
 
         if (isInTerminalState(state) || searchDepth == depthCount) {
             var u = utilityCalculator.calculate(state,cell,turn_max )
-            println("MaxValue => DepthCount : $depthCount    || utility :  $u")
+            println("MaxValue => $cell    || utility :  $u")
             return u
         }
 
@@ -77,7 +91,7 @@ class AIPlayer(turn: Side) : Player(turn) {
         state[cell.x][cell.y] = turn_min
         if (isInTerminalState(state) || searchDepth == depthCount) {
             var u = utilityCalculator.calculate(state,cell,turn_min )
-            println("MinValue => DepthCount : $depthCount    || utility :  $u")
+            println("MinValue => $cell    || utility :  $u")
             return u
         }
         this.depthCount++
