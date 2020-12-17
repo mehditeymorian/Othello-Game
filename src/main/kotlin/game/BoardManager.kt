@@ -1,8 +1,8 @@
 package game
 
 class BoardManager(private val eventListener: BoardEventListener) {
-    val calculator : BoardCalculator = BoardCalculator()
-    var board: Array<Array<Side?>> = Array(calculator.boardSize) { arrayOfNulls(calculator.boardSize) }
+    private val calculator : BoardCalculator = BoardCalculator()
+    var state: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
     var turn: Side = Side.BLACK
 
 
@@ -12,10 +12,10 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
         // init board
         // 2 white 2 black
-        board[3][3] = Side.WHITE
-        board[3][4] = Side.BLACK
-        board[4][3] = Side.BLACK
-        board[4][4] = Side.WHITE
+        state[3][3] = Side.WHITE
+        state[3][4] = Side.BLACK
+        state[4][3] = Side.BLACK
+        state[4][4] = Side.WHITE
         calculator.blackDisks = 2
         calculator.whiteDisks = 2
 
@@ -23,7 +23,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
     // all initialization
     fun start() {
-        eventListener.makeMove(turn, calculator.availableCells(board,turn))
+        eventListener.makeMove(turn, calculator.availableCells(state,turn))
     }
 
 
@@ -36,21 +36,21 @@ class BoardManager(private val eventListener: BoardEventListener) {
         }
 
 
-        board[x][y] = turn // put disk
-        calculator.flipCellsAfterMove(board,Cell(x, y)).forEach {
-            board[it.x][it.y] = board[it.x][it.y]?.flip()
+        state[x][y] = turn // put disk
+        calculator.flipCellsAfterMove(state,Cell(x, y)).forEach {
+            state[it.x][it.y] = state[it.x][it.y]?.flip()
         } // flip disks
-        if (calculator.isGameFinished(board)) {
+        if (calculator.isGameFinished(state)) {
             eventListener.onGameFinish(calculator.getWinner())
             return
         }
 
         turn = turn.flip()
-        var list = calculator.availableCells(board, turn)
+        var list = calculator.availableCells(state, turn)
         if (list.isEmpty()) { // no move possible
             println("No legal move for $turn")
             turn = turn.flip()
-            list = calculator.availableCells(board, turn)
+            list = calculator.availableCells(state, turn)
         }
 
         if (list.isEmpty()) {
@@ -68,7 +68,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
         for (i in 0..7) print(" $i ")
         println()
         var i = 0
-        board.forEach {
+        state.forEach {
             print(" $i ")
             it.forEach { side: Side? -> print(if (side == null) "   " else if (side == Side.BLACK) " B " else " W ") }
             println()
@@ -79,9 +79,9 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
 
     fun printBoardWithAvailableCells(availableCells: List<Cell>) {
-        val copy: Array<Array<String?>> = Array(calculator.boardSize) { arrayOfNulls(calculator.boardSize) }
+        val copy: Array<Array<String?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
 
-        board.forEachIndexed { x, row ->
+        state.forEachIndexed { x, row ->
             row.forEachIndexed { y, side ->
                 copy[x][y] = if (side == null) "   " else if (side == Side.BLACK) " B " else " W "
             }
@@ -90,11 +90,11 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
         println("===========================")
         print("   ")
-        for (i in 0..7) print(" $i ")
+        for (i in 0..7) print(" ${'A'+i} ")
         println()
         var i = 0
         copy.forEach {
-            print(" $i ")
+            print(" ${i+1} ")
             it.forEach(::print)
             println()
             i++
