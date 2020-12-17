@@ -240,7 +240,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     }
 
     private fun Array<Array<Side?>>.getOrNull(x: Int, y: Int): Side? {
-        return this.getOrNull(x)?.get(y)
+        return this.getOrNull(x)?.getOrNull(y)
     }
 
 }
