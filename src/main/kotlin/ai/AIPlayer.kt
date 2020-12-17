@@ -118,7 +118,7 @@ class AIPlayer(turn: Side) : Player(turn) {
 
 
     fun copyBoard(state: Array<Array<Side?>>): Array<Array<Side?>> {
-        var board: Array<Array<Side?>> = Array(boardCalculator.boardSize) { arrayOfNulls(boardCalculator.boardSize) }
+        var board: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
         for (x in board.indices) for (y in board.indices) {
             val side = state[x][y]
             board[x][y] = if (side == null) null else if (side == Side.BLACK) Side.BLACK else Side.WHITE

@@ -1,5 +1,6 @@
 package ai
 
+import game.BOARD_SIZE
 import game.BoardCalculator
 import game.Cell
 import game.Side
@@ -46,9 +47,9 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     private fun edgeFeature(cell: Cell): Double {
         val edges = arrayOf(
             Cell(0, cell.y), // top edge
-            Cell(calculator.boardSize - 1, cell.y), // bottom edge
+            Cell(BOARD_SIZE - 1, cell.y), // bottom edge
             Cell(cell.x, 0), // left edge
-            Cell(cell.x, calculator.boardSize - 1)
+            Cell(cell.x, BOARD_SIZE - 1)
         ) // right edge
 
         var minDistance = Int.MAX_VALUE
@@ -133,13 +134,13 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
                 Cell(1, 0),
                 Cell(1, 1)
             )
-        else if (corner.x == 0 && corner.y == (calculator.boardSize - 1)) // top right corner
+        else if (corner.x == 0 && corner.y == (BOARD_SIZE - 1)) // top right corner
             return arrayOf(
                 Cell(0, 6),
                 Cell(1, 6),
                 Cell(1, 7)
             )
-        else if (corner.x == (calculator.boardSize - 1) && corner.y == 0) // bottom left
+        else if (corner.x == (BOARD_SIZE - 1) && corner.y == 0) // bottom left
             return arrayOf(
                 Cell(6, 0),
                 Cell(6, 1),
