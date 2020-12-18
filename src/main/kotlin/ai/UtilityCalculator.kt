@@ -107,51 +107,55 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         val opponentSide = turn.flip()
 
         when (cell) {
-            Cell(0, 1) -> { // top left corner
+            // top left corner
+            Cell(0, 1) -> {
                 if (state.getOrNull(0,0) == null && state.getOrNull(0,2) == opponentSide)
                     return -1.0
             }
-            Cell(1, 1) -> { // top left corner
+            Cell(1, 1) -> {
                 if (state.getOrNull(0,0) == null && state.getOrNull(2,2) == opponentSide)
                     return -1.0
             }
-            Cell(1, 0) -> { // top left corner
+            Cell(1, 0) -> {
                 if (state.getOrNull(0,0) == null && state.getOrNull(2,0) == opponentSide)
                     return -1.0
             }
-            Cell(0, 6)->{ // top right corner
-                if (state.getOrNull(BOARD_SIZE-1,BOARD_SIZE-1) == null && state.getOrNull(0,5) == opponentSide)
+            // top right corner
+            Cell(0, 6)->{
+                if (state.getOrNull(0,7) == null && state.getOrNull(0,5) == opponentSide)
                     return -1.0
             }
-            Cell(1, 6)->{ // top right corner
-                if (state.getOrNull(BOARD_SIZE-1,BOARD_SIZE-1) == null && state.getOrNull(2,5) == opponentSide)
+            Cell(1, 6)->{
+                if (state.getOrNull(0,7) == null && state.getOrNull(2,5) == opponentSide)
                     return -1.0
             }
-            Cell(1, 7)->{ // top right corner
-                if (state.getOrNull(BOARD_SIZE-1,BOARD_SIZE-1) == null && state.getOrNull(2,7) == opponentSide)
+            Cell(1, 7)->{
+                if (state.getOrNull(0,7) == null && state.getOrNull(2,7) == opponentSide)
                     return -1.0
             }
-            Cell(6, 0)->{ // bottom left corner
+            // bottom left corner
+            Cell(6, 0)->{
                 if (state.getOrNull(7,0) == null && state.getOrNull(5,0) == opponentSide)
                     return -1.0
             }
-            Cell(6, 1)->{ // bottom left corner
+            Cell(6, 1)->{
                 if (state.getOrNull(7,0) == null && state.getOrNull(5,2) == opponentSide)
                     return -1.0
             }
-            Cell(7, 1)->{ // bottom left corner
+            Cell(7, 1)->{
                 if (state.getOrNull(7,0) == null && state.getOrNull(7,2) == opponentSide)
                     return -1.0
             }
-            Cell(6, 6)->{ // bottom right corner
+            // bottom right corner
+            Cell(6, 6)->{
                 if (state.getOrNull(7,7) == null && state.getOrNull(5,5) == opponentSide)
                     return -1.0
             }
-            Cell(6, 7)->{ // bottom right corner
+            Cell(6, 7)->{
                 if (state.getOrNull(7,7) == null && state.getOrNull(5,7) == opponentSide)
                     return -1.0
             }
-            Cell(7, 6)->{ // bottom right corner
+            Cell(7, 6)->{
                 if (state.getOrNull(7,7) == null && state.getOrNull(7,5) == opponentSide)
                     return -1.0
             }
@@ -159,16 +163,15 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
 
 
 
+        var neighbors: List<Side?>? = null
         if (cell.x == 0 || cell.x == BOARD_SIZE - 1) {// in top or bottom edge
-            val neighbors = listOf(state.getOrNull(cell.x, cell.y - 1), state.getOrNull(cell.x, cell.y + 1))
-            if (isWedge(neighbors, opponentSide)) return 1.0
-
+            neighbors = listOf(state.getOrNull(cell.x, cell.y - 1), state.getOrNull(cell.x, cell.y + 1))
         } else if (cell.y == 0 || cell.y == BOARD_SIZE - 1) { // in left or right edge
-            val neighbors = listOf(state.getOrNull(cell.x - 1, cell.y), state.getOrNull(cell.x + 1, cell.y))
-            if (isWedge(neighbors, opponentSide)) return 1.0
+            neighbors = listOf(state.getOrNull(cell.x - 1, cell.y), state.getOrNull(cell.x + 1, cell.y))
         }
 
-        return 0.0
+
+        return if (isWedge(neighbors, opponentSide)) 1.0 else 0.0
     }
 
     private fun manhattanDistance(c1: Cell, c2: Cell): Int {
@@ -235,7 +238,8 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         )
     }
 
-    private fun isWedge(neighbors: List<Side?>, side: Side): Boolean {
+    private fun isWedge(neighbors: List<Side?>?, side: Side): Boolean {
+        if (neighbors == null) return false
         return neighbors.filterNotNull().filter { it == side }.size == 2
     }
 
