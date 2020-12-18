@@ -36,10 +36,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
         }
 
 
-        state[x][y] = turn // put disk
-        calculator.flipCellsAfterMove(state,Cell(x, y)).forEach {
-            state[it.x][it.y] = state[it.x][it.y]?.flip()
-        } // flip disks
+        state.play(Cell(x,y),turn,calculator)
         if (calculator.isGameFinished(state)) {
             eventListener.onGameFinish(calculator.getWinner())
             return
