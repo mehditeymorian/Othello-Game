@@ -3,14 +3,14 @@ package ai
 import game.*
 import kotlin.math.abs
 
-const val MAX_MOBILITY = 20.0
-const val MAX_DISTANCE_TO_CORNER = 5.0
-const val MAX_DISTANCE_TO_EDGE = 7.0
-const val MAX_FLIP = 18.0
-const val FEATURES_COUNT = 7
+
 
 class UtilityCalculator(private val calculator: BoardCalculator, private val weights: DoubleArray) {
     private val corners = cornerCells()
+    val MAX_DISTANCE_TO_CORNER = 5.0
+    val MAX_DISTANCE_TO_EDGE = 7.0
+    val MAX_FLIP = 18.0
+
 
 
     fun calculate(state: Array<Array<Side?>>, cell: Cell, side: Side): Double {
@@ -79,10 +79,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     */
     private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
         val copy = state.copy()
-        copy[cell.x][cell.y] = turn
-        calculator.flipCellsAfterMove(copy,cell).forEach {
-            copy[it.x][it.y] = copy[it.x][it.y]?.flip()
-        }
+        copy.play(cell,turn,calculator)
         val opponentMoves = calculator.availableCells(copy, turn.flip()).size
         return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
     }
@@ -92,7 +89,6 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     private fun dangerCellsFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Int {
         val (corner, _) = nearestCornerTo(cell)
         val dangerCells = dangerCellOf(corner)
-        // todo: correct these weights
         // if in dangerCells:
         //      if has corner 1
         //      else -1
@@ -240,8 +236,5 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
         return neighbors.filterNotNull().filter { it == side }.size == 2
     }
 
-    private fun Array<Array<Side?>>.getOrNull(x: Int, y: Int): Side? {
-        return this.getOrNull(x)?.getOrNull(y)
-    }
 
 }
