@@ -4,7 +4,7 @@ import game.*
 import kotlin.math.max
 import kotlin.math.min
 
-private const val MAX_DEPTH = 20
+private const val MAX_DEPTH = 10
 
 class AIPlayer(turn: Side) : Player(turn) {
     private val boardCalculator = BoardCalculator()
