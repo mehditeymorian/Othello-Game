@@ -478,12 +478,4 @@ class BoardCalculator {
         return if (blackDisks > whiteDisks) Side.BLACK else if (whiteDisks > blackDisks) Side.WHITE else null
     }
 
-    fun copy(state :  Array<Array<Side?>>): Array<Array<Side?>>{
-        val board: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
-        for (x in board.indices) for (y in board.indices) {
-            val side = state[x][y]
-            board[x][y] = side
-        }
-        return board
-    }
 }
