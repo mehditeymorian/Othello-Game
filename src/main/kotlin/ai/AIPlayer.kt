@@ -9,20 +9,14 @@ private const val MAX_DEPTH = 10
 class AIPlayer(turn: Side) : Player(turn) {
     private val boardCalculator = BoardCalculator()
     private val featureWeights = DoubleArray(FEATURES_COUNT) { 1.0 }
-    private val utilityCalculator = UtilityCalculator(boardCalculator, featureWeights)
+    private val utility = Utility(boardCalculator, featureWeights)
 
+    init {
+        featureWeights[4] = 10.0
+    }
 
     override fun move(state: Array<Array<Side?>>, availableCells: List<Cell>): Cell {
 
-//        var bestMove = availableCells[0]
-//        var bestPoint = Double.MIN_VALUE
-//        availableCells.forEach {
-//            val utility = utilityCalculator.calculate(state, it, turn)
-//            if (utility > bestPoint) {
-//                bestMove = it
-//                bestPoint = utility
-//            }
-//        }
 
         val boundary = doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE)// alpha beta
         var bestPoint = Double.MIN_VALUE
@@ -46,13 +40,12 @@ class AIPlayer(turn: Side) : Player(turn) {
         turn: Side,
         depth: Int
     ): Double {
+        //play the move
+        state.play(cell, turn, boardCalculator)
 
         if (isTerminalState(state, depth))
-            return utilityCalculator.calculate(state, cell, turn)
+            return utility.calculate(state, turn)
 
-
-        // if game is not finished play the move
-        state.play(cell, turn, boardCalculator)
 
         val opponent: Side = turn.flip()
         var bestPoint = Double.MIN_VALUE
@@ -73,12 +66,12 @@ class AIPlayer(turn: Side) : Player(turn) {
         turn: Side,
         depth: Int
     ): Double {
+        //play the move
+        state.play(cell, turn, boardCalculator)
 
         if (isTerminalState(state, depth))
-            return utilityCalculator.calculate(state, cell, turn)
+            return utility.calculate(state, turn)
 
-        // if game is not finished play the move
-        state.play(cell, turn, boardCalculator)
 
         val opponent: Side = turn.flip()
         var bestPoint = Double.MAX_VALUE
