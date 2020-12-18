@@ -1,9 +1,6 @@
 package ai
 
-import game.BOARD_SIZE
-import game.BoardCalculator
-import game.Cell
-import game.Side
+import game.*
 import kotlin.math.abs
 
 const val MAX_MOBILITY = 20.0
@@ -67,7 +64,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     */
     private fun maxFlipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
         return if (hasCorner(state, turn)) {
-            val copy = calculator.copy(state)
+            val copy = state.copy()
             copy[cell.x][cell.y] = turn
             calculator.flipCellsAfterMove(copy, cell).size / MAX_FLIP
         } else 0.0
@@ -81,7 +78,7 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
     * the less moves gives to opponent the better current move it is
     */
     private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-        val copy = calculator.copy(state)
+        val copy = state.copy()
         copy[cell.x][cell.y] = turn
         calculator.flipCellsAfterMove(copy,cell).forEach {
             copy[it.x][it.y] = copy[it.x][it.y]?.flip()

@@ -28,7 +28,7 @@ class AIPlayer(turn: Side) : Player(turn) {
         var bestPoint = Double.MIN_VALUE
         var bestMove = Cell(-1, -1)
         availableCells.forEach {
-            val each = maxValue(boardCalculator.copy(state), boundary, it, playerTurn, 0)
+            val each = maxValue(state.copy(), boundary, it, playerTurn, 0)
             if (each > bestPoint) {
                 bestPoint = each
                 bestMove = it
