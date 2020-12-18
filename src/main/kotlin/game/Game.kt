@@ -23,7 +23,7 @@ class Game(private val player1: Player, private val player2: Player) : BoardEven
         boardManager.printBoardWithAvailableCells(availableCells)
         boardManager.printScores()
         println("${turn.name} Move:")
-        val move = if (turn == player1.turn) player1.move(boardManager.state,availableCells)
+        val move = if (turn == player1.playerTurn) player1.move(boardManager.state,availableCells)
         else player2.move(boardManager.state,availableCells)
         boardManager.putDisk(move.x, move.y, availableCells)
 
