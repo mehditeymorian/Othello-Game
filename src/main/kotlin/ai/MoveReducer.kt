@@ -1,48 +1,54 @@
 package ai
 
 import game.*
+import java.util.stream.Collectors
 import kotlin.math.abs
 
 
-
-class UtilityCalculator(private val calculator: BoardCalculator, private val weights: DoubleArray) {
+const val MAX_DISTANCE_TO_CORNER = 5.0
+const val MAX_DISTANCE_TO_EDGE = 7.0
+const val MAX_FLIP = 18.0
+const val MOVE_EVALUATE_FEATURES = 7
+const val MOVE_LIMIT = 3L
+class MoveReducer(private val calculator: BoardCalculator, private val weights: DoubleArray) {
     private val corners = cornerCells()
-    val MAX_DISTANCE_TO_CORNER = 5.0
-    val MAX_DISTANCE_TO_EDGE = 7.0
-    val MAX_FLIP = 18.0
 
 
+    fun reduce(moves: ArrayList<Cell>, state: Array<Array<Side?>>, depth: Int, turn: Side): List<Cell> {
+        return if (depth == 0) moves
+        else moves.stream()
+            .sorted { c1, c2 ->
+                val c2Points = calculate(state, c2, turn)
+                val c1Points = calculate(state, c1, turn)
+                val sortValue = c2Points - c1Points
+                if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0}
+            .limit(MOVE_LIMIT)
+            .collect(Collectors.toList())
+    }
 
-    fun calculate(state: Array<Array<Side?>>, cell: Cell, side: Side): Double {
-//        return arrayOf(
-//            cornerFeature(cell),
-//            edgeFeature(cell),
-//            maxFlipFeature(state, cell, side),
-//            unflipableDisksFeature(state),
-//            mobilityFeature(state, cell, side),
-//            dangerCellsFeature(state, cell, side)
-//        )
+
+    private fun calculate(state: Array<Array<Side?>>, cell: Cell, side: Side): Double {
         return weights[0] * cornerFeature(cell) +
-                weights[1] * edgeFeature(cell) +
-                weights[2] * maxFlipFeature(state, cell, side) +
-                weights[3] * unflipableDisksFeature(state) +
+                weights[1] * edgeFeature(state,cell) +
+                weights[2] * flipFeature(state, cell, side) +
+                weights[3] * givingCornerFeature(state, cell, side) +
                 weights[4] * mobilityFeature(state, cell, side) +
                 weights[5] * dangerCellsFeature(state, cell, side) +
                 weights[6] * wedgingFeature(state,cell,side)
     }
 
-    /* calculate distance to nearest corner
-       and return Max-distance - minDistance
+    /* if cell is corner it's really good
     */
     private fun cornerFeature(cell: Cell): Double {
-        val (_, distance) = nearestCornerTo(cell)
-        return (MAX_DISTANCE_TO_CORNER - distance) / MAX_DISTANCE_TO_CORNER
+        return if (cell in cornerCells()) 1.0 else 0.0
     }
 
-    /* calculate distance to nearest cell
-       and return Max-distance - minDistance
+    /* in the beginning of the game, cells in the middle are better
     */
-    private fun edgeFeature(cell: Cell): Double {
+    private fun edgeFeature(state: Array<Array<Side?>>, cell: Cell): Double {
+        // for last 30 disk return 0
+        if (state.leftMoves() < 30) return 0.0
+
         val edges = arrayOf(
             Cell(0, cell.y), // top edge
             Cell(BOARD_SIZE - 1, cell.y), // bottom edge
@@ -56,22 +62,27 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
             if (manhattanDistance < minDistance) minDistance = manhattanDistance
         }
 
-        return (MAX_DISTANCE_TO_EDGE - minDistance) / MAX_DISTANCE_TO_EDGE
+        return minDistance / MAX_DISTANCE_TO_EDGE
     }
 
-    /* if has a corner calculate number of cell that flips after this move
-        otherwise return 0
+    /* choose cell that flip less in beginning of the game
+       and choose cell that flip more in the end of game
     */
-    private fun maxFlipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-        return if (hasCorner(state, turn)) {
-            val copy = state.copy()
-            copy[cell.x][cell.y] = turn
-            calculator.flipCellsAfterMove(copy, cell).size / MAX_FLIP
-        } else 0.0
+    private fun flipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+        val copy = state.copy()
+        copy[cell.x][cell.y] = turn
+        val flips = calculator.flipCellsAfterMove(copy,cell).size
+        return if (copy.leftMoves() < 20) flips/ MAX_FLIP
+        else (MAX_FLIP - flips)/ MAX_FLIP
     }
 
-    private fun unflipableDisksFeature(state: Array<Array<Side?>>): Int {
-        return 0
+    private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+//        state.play(cell,turn,calculator)
+//        val opponentAvailableCell = calculator.availableCells(state, turn.flip())
+//        for (corner in cornerCells())
+//            if (corner in opponentAvailableCell)
+//                return -1.0
+        return 0.0
     }
 
     /* if we choose this cell how many moves does opponent get
@@ -169,14 +180,6 @@ class UtilityCalculator(private val calculator: BoardCalculator, private val wei
 
     private fun manhattanDistance(c1: Cell, c2: Cell): Int {
         return abs(c1.x - c2.x) + abs(c1.y - c2.y)
-    }
-
-    private fun hasCorner(state: Array<Array<Side?>>, turn: Side): Boolean {
-        for (each in corners) {
-            val corner = state[each.x][each.y]
-            if (turn == corner) return true
-        }
-        return false
     }
 
     private fun nearestCornerTo(cell: Cell): Pair<Cell, Int> {
