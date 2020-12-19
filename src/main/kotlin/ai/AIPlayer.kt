@@ -4,15 +4,18 @@ import game.*
 import kotlin.math.max
 import kotlin.math.min
 
-private const val MAX_DEPTH = 10
+private const val MAX_DEPTH = 15
 
 class AIPlayer(turn: Side) : Player(turn) {
     private val boardCalculator = BoardCalculator()
     private val featureWeights = DoubleArray(FEATURES_COUNT) { 1.0 }
     private val utility = Utility(boardCalculator, featureWeights)
+    private val moveReducerWeights = DoubleArray(MOVE_EVALUATE_FEATURES) { 1.0 }
+    private val moveReducer = MoveReducer(boardCalculator, moveReducerWeights)
 
     init {
-        featureWeights[4] = 10.0
+        featureWeights[4] = 10.0 // corner feature
+        moveReducerWeights[0] = 5.0 // isCorner feature
     }
 
     override fun move(state: Array<Array<Side?>>, availableCells: List<Cell>): Cell {
@@ -22,7 +25,7 @@ class AIPlayer(turn: Side) : Player(turn) {
         var bestPoint = Double.MIN_VALUE
         var bestMove = Cell(-1, -1)
         availableCells.forEach {
-            val each = maxValue(state.copy(), boundary, it, playerTurn, 0)
+            val each = maxValue(state.copy(), boundary, it, playerTurn, 1)
             if (each > bestPoint) {
                 bestPoint = each
                 bestMove = it
@@ -49,7 +52,8 @@ class AIPlayer(turn: Side) : Player(turn) {
 
         val opponent: Side = turn.flip()
         var bestPoint = Double.MIN_VALUE
-        boardCalculator.availableCells(state, opponent).forEach {
+        val availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent),state,depth,turn)
+        availableCells.forEach {
             bestPoint = max(bestPoint, minValue(state.copy(), boundary, it, opponent, depth + 1))
             if (bestPoint >= boundary[1]) return bestPoint // if bestPoint >= beta return bestPoint
             boundary[0] = max(boundary[0], bestPoint) // alpha = max(alpha,bestPoint)
@@ -75,7 +79,8 @@ class AIPlayer(turn: Side) : Player(turn) {
 
         val opponent: Side = turn.flip()
         var bestPoint = Double.MAX_VALUE
-        boardCalculator.availableCells(state, opponent).forEach {
+        val availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent),state,depth,turn)
+        availableCells.forEach {
             bestPoint = min(bestPoint, maxValue(state.copy(), boundary, it, opponent, depth + 1))
             if (bestPoint <= boundary[0]) return bestPoint // if bestPoint <= alpha return bestPoint
             boundary[1] = min(boundary[1], bestPoint) // alpha = min(beta,bestPoint)
