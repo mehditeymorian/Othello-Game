@@ -1,5 +1,7 @@
 package game
 
+import kotlin.math.abs
+
 fun Array<Array<Side?>>.copy(): Array<Array<Side?>> {
     val board: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
     for (x in this.indices) for (y in this.indices) {
@@ -73,5 +75,9 @@ fun Array<Array<Side?>>.countDisks(): Pair<Int, Int> {
 
 fun Array<Array<Side?>>.isStable(cell: Cell): Boolean {
     return false
+}
+
+fun manhattanDistance(c1: Cell, c2: Cell): Int {
+    return abs(c1.x - c2.x) + abs(c1.y - c2.y)
 }
 

@@ -185,9 +185,6 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
         return if (isWedge(neighbors, opponentSide)) 1.0 else 0.0
     }
 
-    private fun manhattanDistance(c1: Cell, c2: Cell): Int {
-        return abs(c1.x - c2.x) + abs(c1.y - c2.y)
-    }
 
     private fun nearestCornerTo(cell: Cell): Pair<Cell, Int> {
         var minDistance = Int.MAX_VALUE
