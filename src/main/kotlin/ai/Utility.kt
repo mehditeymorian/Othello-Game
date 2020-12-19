@@ -27,6 +27,35 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
     }
 
     private fun stableDisksFeature(state: Array<Array<Side?>>, side: Side): Double {
+        val turnCells = arrayListOf<Cell>()
+        val stableCells = arrayListOf<Cell>()
+        val unstableCells = arrayListOf<Cell>()
+        val opponentMoveCells = calculator.availableCells(state , side.flip())
+
+        for ( row in state.indices){
+            for (col in state.indices){
+                if(state[row][col] == side ) {
+                    turnCells.add(Cell(row, col))
+                }
+            }
+        }
+
+        for (i in opponentMoveCells.indices){
+            var copyBoard =state.copy()
+            copyBoard.play(opponentMoveCells[i] , side.flip() , calculator)
+            for (j in turnCells.indices){
+                if (copyBoard[turnCells[j].x][turnCells[j].y] == side
+                    && copyBoard[turnCells[j].x][turnCells[j].y] != null){
+                    if (!stableCells.contains(turnCells[j])) {
+                        stableCells.add(turnCells[j])
+                    }
+                }else if (copyBoard[turnCells[j].x][turnCells[j].y] == side.flip()
+                    && copyBoard[turnCells[j].x][turnCells[j].y] != null){
+                    unstableCells.add(turnCells[j])
+                }
+            }
+        }
+        //return stableCells
         return 0.0
     }
 
@@ -76,4 +105,55 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
         )
     }
 
+    private fun check_stability_in8direction(s: Array<Array<Side?>>, row: Int, col: Int):Boolean {
+        var i = row
+        var j = col
+        while ( j-- >= 0 && col != 0 ){         //left
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( j++ <= 7 && col != 7 ){         //right
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( i-- >= 0 && row != 0 ){         //up
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( i-- >= 0 && row != 7 ){         //down
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( j-- >= 0 && col != 0 && i-- >= 0 && row != 0 ){         //left-up
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( j++ <= 7 && col != 7 && i-- >= 0 && row != 0  ){         //right-up
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( j-- >= 0 && col != 0 &&  i++ >= 0 && row != 7 ){         //left-down
+            if ( s[row][j]==null)
+                return false
+        }
+        i = row
+        j = col
+        while ( j++ <= 7 && col != 7 &&  i++ >= 0 && row != 7){         //right-down
+            if ( s[row][j]==null)
+                return false
+        }
+        return true
+    }
 }
