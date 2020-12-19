@@ -71,3 +71,7 @@ fun Array<Array<Side?>>.countDisks(): Pair<Int, Int> {
     return Pair(whiteDisks, blackDisks)
 }
 
+fun Array<Array<Side?>>.isStable(cell: Cell): Boolean {
+    return false
+}
+
