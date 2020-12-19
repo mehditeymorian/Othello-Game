@@ -24,7 +24,7 @@ class AIPlayer(turn: Side) : Player(turn) {
         val boundary = doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE)// alpha beta
         var bestPoint = Double.MIN_VALUE
         var bestMove = Cell(-1, -1)
-        availableCells.forEach {
+        moveReducer.reduce(availableCells as ArrayList<Cell>,state,0,playerTurn).forEach {
             val each = maxValue(state.copy(), boundary, it, playerTurn, 1)
             if (each > bestPoint) {
                 bestPoint = each
