@@ -3,6 +3,7 @@ package ai
 import game.*
 import java.util.stream.Collectors
 import kotlin.math.abs
+import kotlin.math.ceil
 
 
 const val MAX_DISTANCE_TO_CORNER = 5.0
@@ -22,8 +23,13 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
                 val c1Points = calculate(state, c1, turn)
                 val sortValue = c2Points - c1Points
                 if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0}
-            .limit(MOVE_LIMIT)
+            .limit(getMovesLimit(moves.size,depth))
             .collect(Collectors.toList())
+    }
+
+    private fun getMovesLimit(size: Int, depth: Int): Long{
+        return if (depth == 0) ceil((size*3.0)/4.0).toLong()
+        else MOVE_LIMIT
     }
 
 
@@ -77,11 +83,12 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     }
 
     private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-//        state.play(cell,turn,calculator)
-//        val opponentAvailableCell = calculator.availableCells(state, turn.flip())
-//        for (corner in cornerCells())
-//            if (corner in opponentAvailableCell)
-//                return -1.0
+        val copy = state.copy()
+        copy.play(cell,turn,calculator)
+        val opponentAvailableCell = calculator.availableCells(copy, turn.flip())
+        for (corner in cornerCells())
+            if (corner in opponentAvailableCell)
+                return -1.0
         return 0.0
     }
 
