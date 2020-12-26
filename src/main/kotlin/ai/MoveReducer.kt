@@ -16,7 +16,7 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
 
     fun reduce(moves: ArrayList<Cell>, state: Array<Array<Side?>>, depth: Int, turn: Side): List<Cell> {
-        return if (depth == 0) moves
+        return if (depth == 1) moves
         else moves.stream()
             .sorted { c1, c2 ->
                 val c2Points = calculate(state, c2, turn)
@@ -75,17 +75,17 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
        and choose cell that flip more in the end of game
     */
     private fun flipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-        val copy = state.copy()
-        copy[cell.x][cell.y] = turn
-        val flips = calculator.flipCellsAfterMove(copy,cell).size
-        return if (copy.leftMoves() < 20) flips/ MAX_FLIP
+        state[cell.x][cell.y] = turn
+        val flips = calculator.flipCellsAfterMove(state,cell).size
+        state[cell.x][cell.y] = null // reset board to start value
+        return if (state.leftMoves() < 20) flips/ MAX_FLIP
         else (MAX_FLIP - flips)/ MAX_FLIP
     }
 
     private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-        val copy = state.copy()
-        copy.play(cell,turn,calculator)
-        val opponentAvailableCell = calculator.availableCells(copy, turn.flip())
+        val flippedCells = state.play(cell, turn, calculator)
+        val opponentAvailableCell = calculator.availableCells(state, turn.flip())
+        state.undoMove(cell, flippedCells) // undo move
         for (corner in cornerCells())
             if (corner in opponentAvailableCell)
                 return -1.0
@@ -96,9 +96,9 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     * the less moves gives to opponent the better current move it is
     */
     private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-        val copy = state.copy()
-        copy.play(cell,turn,calculator)
-        val opponentMoves = calculator.availableCells(copy, turn.flip()).size
+        val flippedCells = state.play(cell, turn, calculator)
+        val opponentMoves = calculator.availableCells(state, turn.flip()).size
+        state.undoMove(cell, flippedCells) // undo the move played
         return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
     }
 

@@ -11,11 +11,21 @@ fun Array<Array<Side?>>.copy(): Array<Array<Side?>> {
     return board
 }
 
-fun Array<Array<Side?>>.play(cell: Cell, turn: Side, calculator: BoardCalculator) {
+fun Array<Array<Side?>>.play(cell: Cell, turn: Side, calculator: BoardCalculator): List<Cell> {
     this[cell.x][cell.y] = turn // put disk
-    calculator.flipCellsAfterMove(this, cell).forEach {
+    val flipCellsAfterMove = calculator.flipCellsAfterMove(this, cell)
+    flipCellsAfterMove.forEach {
         this[it.x][it.y] = this[it.x][it.y]?.flip()
     } // flip disks
+
+    return flipCellsAfterMove
+}
+
+fun Array<Array<Side?>>.undoMove(cell: Cell, flippedCells: List<Cell>) {
+    this[cell.x][cell.y] = null // remove disk
+    flippedCells.forEach {
+        this[it.x][it.y] = this[it.x][it.y]?.flip()
+    }
 }
 
 fun Array<Array<Side?>>.isFull(): Boolean {
