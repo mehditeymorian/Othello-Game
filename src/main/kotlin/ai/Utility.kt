@@ -5,7 +5,7 @@ import game.*
 const val MAX_POTENTIAL_MOBILITY = 20.0
 const val MAX_CAPTURED_CORNERS = 4.0
 const val MAX_DISKS_DIFFERENCE = 60.0
-const val FEATURES_COUNT = 7
+const val FEATURES_COUNT = 6
 const val MAX_MOBILITY = 20.0
 
 class Utility(private val calculator: BoardCalculator, private val weights: DoubleArray) {
@@ -20,13 +20,13 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
                 weights[5] * parityFeature(state, side)
     }
 
-    private fun disksDifferenceFeature(state: Array<Array<Side?>>, side: Side): Double {
+    private fun disksDifferenceFeature(state: Array<Array<Side?>>, side: Side): Double { // range 4 to 8
         val (whiteDisks, blackDisks) = state.countDisks()
         return if (side == Side.WHITE) (whiteDisks - blackDisks) / MAX_DISKS_DIFFERENCE
         else (blackDisks - whiteDisks) / MAX_DISKS_DIFFERENCE
     }
 
-    private fun stableDisksFeature(state: Array<Array<Side?>>, side: Side): Double {
+    private fun stableDisksFeature(state: Array<Array<Side?>>, side: Side): Double { // range 10 to 15
 //        val turnCells = arrayListOf<Cell>()
 //        val stableCells = arrayListOf<Cell>()
 //        val unstableCells = arrayListOf<Cell>()
@@ -60,13 +60,13 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
     }
 
     // the less move opponent has the better it is
-    private fun mobilityFeature(state: Array<Array<Side?>>, side: Side): Double {
+    private fun mobilityFeature(state: Array<Array<Side?>>, side: Side): Double { // range 7 to 12
         val opponentMoves = calculator.availableCells(state, side.flip()).size
         return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
     }
 
     // the less potential mobility current player has the better it is
-    private fun potentialMobilityFeature(state: Array<Array<Side?>>, side: Side): Double {
+    private fun potentialMobilityFeature(state: Array<Array<Side?>>, side: Side): Double { // range 4 to 8
         var frontiersCount = 0
         for (x in state.indices)
             for (y in state.indices)
@@ -76,7 +76,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
         return (MAX_POTENTIAL_MOBILITY - frontiersCount) / MAX_POTENTIAL_MOBILITY
     }
 
-    private fun cornerFeature(state: Array<Array<Side?>>, side: Side): Double {
+    private fun cornerFeature(state: Array<Array<Side?>>, side: Side): Double { // range 12 to 15
         var capturedCorners = 0
         cornerCells().forEach {
             if (state.getOrNull(it.x, it.y) == side) capturedCorners++
@@ -86,7 +86,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
     }
 
     // current player played
-    private fun parityFeature(state: Array<Array<Side?>>, side: Side): Double {
+    private fun parityFeature(state: Array<Array<Side?>>, side: Side): Double { // range 2 to 7
         val leftMoves = state.leftMoves()
         return if (leftMoves % 2 == 0) 1.0 else 0.0
     }

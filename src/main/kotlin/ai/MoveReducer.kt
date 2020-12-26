@@ -45,13 +45,13 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
     /* if cell is corner it's really good
     */
-    private fun cornerFeature(cell: Cell): Double {
+    private fun cornerFeature(cell: Cell): Double { // range 10 to 15
         return if (cell in cornerCells()) 1.0 else 0.0
     }
 
     /* in the beginning of the game, cells in the middle are better
     */
-    private fun edgeFeature(state: Array<Array<Side?>>, cell: Cell): Double {
+    private fun edgeFeature(state: Array<Array<Side?>>, cell: Cell): Double { // range 1 to 8
         // for last 30 disk return 0
         if (state.leftMoves() < 30) return 0.0
 
@@ -74,7 +74,7 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     /* choose cell that flip less in beginning of the game
        and choose cell that flip more in the end of game
     */
-    private fun flipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+    private fun flipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 5 to 10
         state[cell.x][cell.y] = turn
         val flips = calculator.flipCellsAfterMove(state,cell).size
         state[cell.x][cell.y] = null // reset board to start value
@@ -82,7 +82,7 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
         else (MAX_FLIP - flips)/ MAX_FLIP
     }
 
-    private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+    private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 8 to 13
         val flippedCells = state.play(cell, turn, calculator)
         val opponentAvailableCell = calculator.availableCells(state, turn.flip())
         state.undoMove(cell, flippedCells) // undo move
@@ -95,7 +95,7 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     /* if we choose this cell how many moves does opponent get
     * the less moves gives to opponent the better current move it is
     */
-    private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+    private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 4 to 8
         val flippedCells = state.play(cell, turn, calculator)
         val opponentMoves = calculator.availableCells(state, turn.flip()).size
         state.undoMove(cell, flippedCells) // undo the move played
@@ -104,7 +104,7 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
     /* being in the C cells
     */
-    private fun dangerCellsFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Int {
+    private fun dangerCellsFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Int { // range 3 to 7
         val (corner, _) = nearestCornerTo(cell)
         val dangerCells = dangerCellOf(corner)
         // if in dangerCells:
@@ -114,7 +114,7 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
         return if (cell in dangerCells) if (turn == state.getOrNull(corner.x,corner.y)) 1 else -1 else 0
     }
 
-    private fun wedgingFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+    private fun wedgingFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 3 to 7
         val opponentSide = turn.flip()
 
         when (cell) {
