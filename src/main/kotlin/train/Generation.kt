@@ -2,6 +2,7 @@ package train
 
 var geneId = 0
 var geneSize = 13
+
 fun initialGeneration(size: Int): ArrayList<Gene> {
 
     val parentList: ArrayList<Gene> = ArrayList()
@@ -12,7 +13,7 @@ fun initialGeneration(size: Int): ArrayList<Gene> {
         randArray(weightArr , geneSize/2 )
 
         for (j in 0..weightArr.size){
-            if ( weightArr[j]==null){
+            if ( weightArr[j]==0.0){
                 when(j){
                     //MoveReducer Features
                     0 -> weightArr[j] = randNumber(10 , 15) //cornerFeature
@@ -33,14 +34,13 @@ fun initialGeneration(size: Int): ArrayList<Gene> {
                 }
             }
         }
-        parentList.add(Gene(geneId++ , 0 , weightArr!! ))
+        parentList.add(Gene(geneId++ , 0 , weightArr ))
     }
     return parentList
 }
 
 fun avgGene(genes: ArrayList<Gene>): Gene {
     val avgWeight = DoubleArray(geneSize){0.0}
-
 
     for (j in 0..geneSize){
         avgWeight[j] = 0.0
@@ -73,4 +73,11 @@ fun applyCrossover(gene1: Gene, gene2: Gene): Gene {
    should consider min(1) or max(15)
 * */
 fun applyMutation(gene: Gene) {
+    for(i in 0..geneSize){
+        gene.weights[i] += gaussian()
+        if ( gene.weights[i] > 15.0 )
+            gene.weights[i]= 15.0
+        else if ( gene.weights[i] < 0.0)
+            gene.weights[i]= 0.0
+    }
 }
