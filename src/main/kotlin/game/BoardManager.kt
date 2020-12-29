@@ -102,4 +102,8 @@ class BoardManager(private val eventListener: BoardEventListener) {
     fun printScores() {
         println("Black : ${calculator.blackDisks}     White : ${calculator.whiteDisks}")
     }
+
+    fun getDisksCount(): Pair<Int, Int> {
+        return calculator.getDisksCount()
+    }
 }

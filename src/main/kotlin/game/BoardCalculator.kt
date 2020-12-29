@@ -478,4 +478,8 @@ class BoardCalculator {
         return if (blackDisks > whiteDisks) Side.BLACK else if (whiteDisks > blackDisks) Side.WHITE else null
     }
 
+    fun getDisksCount(): Pair<Int, Int> {
+        return Pair(blackDisks,whiteDisks)
+    }
+
 }
