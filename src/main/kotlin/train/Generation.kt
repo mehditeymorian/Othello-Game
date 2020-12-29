@@ -1,5 +1,7 @@
 package train
 
+var geneId = 0
+
 fun initialGeneration(size: Int): ArrayList<Gene> {
     TODO()
 }
