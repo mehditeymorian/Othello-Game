@@ -15,7 +15,7 @@ fun avgGene(genes: ArrayList<Gene>): Gene {
 fun generateChildren(genes: ArrayList<Gene>): ArrayList<Gene> {
     // crossover is applied for gene or not
     val children = ArrayList<Gene>()
-    val crossoverApplied = BooleanArray(genes.size)
+    val copy = ArrayList(genes)
 
 
     TODO()
