@@ -6,11 +6,9 @@ import kotlin.math.min
 
 private const val MAX_DEPTH = 15
 
-class AIPlayer(turn: Side) : Player(turn) {
+class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: DoubleArray) : Player(turn) {
     private val boardCalculator = BoardCalculator()
-    private val featureWeights = DoubleArray(FEATURES_COUNT) { 1.0 }
     private val utility = Utility(boardCalculator, featureWeights)
-    private val moveReducerWeights = DoubleArray(MOVE_EVALUATE_FEATURES) { 1.0 }
     private val moveReducer = MoveReducer(boardCalculator, moveReducerWeights)
 
     init {
