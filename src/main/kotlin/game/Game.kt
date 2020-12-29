@@ -1,7 +1,7 @@
 package game
 
 class Game(private val player1: Player, private val player2: Player) : BoardEventListener {
-    private val boardManager = BoardManager(this)
+    val boardManager = BoardManager(this)
 
 
     fun start() {
