@@ -16,7 +16,7 @@ fun main() {
     when (choice) {
         2 ->{ // human vs AI
             player1 = HumanPlayer(Side.BLACK)
-            player2 = AIPlayer(Side.WHITE)
+            player2 = AIPlayer(Side.WHITE,DoubleArray(10) { 1.0 },DoubleArray(10) { 1.0 })
         }
         else -> { // human vs human
             player1 = HumanPlayer(Side.BLACK)
