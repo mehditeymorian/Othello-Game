@@ -49,7 +49,7 @@ fun avgGene(genes: ArrayList<Gene>): Gene {
         }
         avgWeight[j] /= geneSize.toDouble()
     }
-    return Gene(-1 , genes[0].generation , avgWeight)
+    return Gene( geneId++ , genes[0].generation , avgWeight)
 }
 
 /* select parent randomly
@@ -66,7 +66,12 @@ fun generateChildren(genes: ArrayList<Gene>): ArrayList<Gene> {
 
 * */
 fun applyCrossover(gene1: Gene, gene2: Gene): Gene {
-    TODO()
+    val ci = DoubleArray(geneSize){0.0}
+    val a = randNumber()
+    for (i in 0..geneSize){
+        ci[i] = a* gene1.weights[i] + (1-a)* gene2.weights[i]
+    }
+    return Gene(geneId++ , gene1.generation+1 , ci )
 }
 
 /* add a positive or negative random value to every weight
