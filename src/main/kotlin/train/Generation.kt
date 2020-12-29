@@ -55,11 +55,29 @@ fun avgGene(genes: ArrayList<Gene>): Gene {
 /* select parent randomly
 *  set true for genes after crossover in applied array*/
 fun generateChildren(genes: ArrayList<Gene>): ArrayList<Gene> {
-    // crossover is applied for gene or not
+    // mutation is applied for gene or not
+    // crossover will be applied always
     val children = ArrayList<Gene>()
     val copy = ArrayList(genes)
 
-    TODO()
+    while (copy.isNotEmpty()){
+        var rnd = randNumber(copy.size)
+        val gen1 = copy[rnd]
+        copy.removeAt(rnd)
+
+        rnd = randNumber(copy.size)
+        val gen2 = copy[rnd]
+        copy.removeAt(rnd)
+
+        val child = applyCrossover(gen1 , gen2)
+
+        if (randNumber() <= 0.7 ){
+            applyMutation(child)
+        }
+        children.add(child)
+
+    }
+    return children
 }
 
 /* AVG gene: Ci = αiP1 + (1-αi)P2 , αi ϵ (0,1)
