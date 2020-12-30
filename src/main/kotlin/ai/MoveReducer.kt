@@ -11,6 +11,14 @@ const val MAX_DISTANCE_TO_EDGE = 7.0
 const val MAX_FLIP = 18.0
 const val MOVE_EVALUATE_FEATURES = 7
 const val MOVE_LIMIT = 3L
+
+const val REDUCER_CORNER = 0
+const val REDUCER_EDGE = 1
+const val REDUCER_FLIP = 2
+const val REDUCER_GIVING_CORNER = 3
+const val REDUCER_MOBILITY = 4
+const val REDUCER_CORNER_NEIGHBOR = 5
+
 class MoveReducer(private val calculator: BoardCalculator, private val weights: DoubleArray) {
     private val corners = cornerCells()
 
@@ -34,13 +42,12 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
 
     private fun calculate(state: Array<Array<Side?>>, cell: Cell, side: Side): Double {
-        return weights[0] * cornerFeature(cell) +
-                weights[1] * edgeFeature(state,cell) +
-                weights[2] * flipFeature(state, cell, side) +
-                weights[3] * givingCornerFeature(state, cell, side) +
-                weights[4] * mobilityFeature(state, cell, side) +
-                weights[5] * dangerCellsFeature(state, cell, side) +
-                weights[6] * wedgingFeature(state,cell,side)
+        return weights[REDUCER_CORNER] * cornerFeature(cell) +
+                weights[REDUCER_EDGE] * edgeFeature(state,cell) +
+                weights[REDUCER_FLIP] * flipFeature(state, cell, side) +
+                weights[REDUCER_GIVING_CORNER] * givingCornerFeature(state, cell, side) +
+                weights[REDUCER_MOBILITY] * mobilityFeature(state, cell, side) +
+                weights[REDUCER_CORNER_NEIGHBOR] * cornerNeighborFeature(state, cell, side)
     }
 
     /* if cell is corner it's really good
@@ -100,6 +107,10 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
         val opponentMoves = calculator.availableCells(state, turn.flip()).size
         state.undoMove(cell, flippedCells) // undo the move played
         return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
+    }
+
+    private fun cornerNeighborFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+        TODO()
     }
 
     /* being in the C cells
@@ -184,7 +195,6 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
         return if (isWedge(neighbors, opponentSide)) 1.0 else 0.0
     }
-
 
     private fun nearestCornerTo(cell: Cell): Pair<Cell, Int> {
         var minDistance = Int.MAX_VALUE

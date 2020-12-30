@@ -8,16 +8,23 @@ const val MAX_DISKS_DIFFERENCE = 60.0
 const val FEATURES_COUNT = 6
 const val MAX_MOBILITY = 20.0
 
+const val FEATURE_DISK_DIFFERENCE = 0
+const val FEATURE_MOBILITY = 1
+const val FEATURE_POTENTIAL_MOBILITY = 2
+const val FEATURE_CORNER = 3
+const val FEATURE_PARITY = 4
+const val FEATURE_STABLE_DISKS = 5
+
 class Utility(private val calculator: BoardCalculator, private val weights: DoubleArray) {
 
 
     fun calculate(state: Array<Array<Side?>>, side: Side): Double {
-        return weights[0] * disksDifferenceFeature(state, side) +
-                weights[1] * stableDisksFeature(state, side) +
-                weights[2] * mobilityFeature(state,side) +
-                weights[3] * potentialMobilityFeature(state, side) +
-                weights[4] * cornerFeature(state, side) +
-                weights[5] * parityFeature(state, side)
+        return weights[FEATURE_DISK_DIFFERENCE] * disksDifferenceFeature(state, side) +
+                weights[FEATURE_MOBILITY] * mobilityFeature(state,side) +
+                weights[FEATURE_POTENTIAL_MOBILITY] * potentialMobilityFeature(state, side) +
+                weights[FEATURE_CORNER] * cornerFeature(state, side) +
+                weights[FEATURE_PARITY] * parityFeature(state, side) +
+                weights[FEATURE_STABLE_DISKS] * stableDisksFeature(state, side)
     }
 
     private fun disksDifferenceFeature(state: Array<Array<Side?>>, side: Side): Double { // range 4 to 8
