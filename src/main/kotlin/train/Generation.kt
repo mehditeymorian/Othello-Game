@@ -1,7 +1,7 @@
 package train
 
 var geneId = 0
-var geneSize = 13
+var geneSize = 11
 
 fun initialGeneration(size: Int): ArrayList<Gene> {
 
