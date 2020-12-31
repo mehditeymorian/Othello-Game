@@ -20,6 +20,8 @@ fun main() = runBlocking {
         generationId++
         val generation = selectNextGeneration(lastGeneration)
         logGeneration(generation)
+        // todo: create tuples of which gene play with which and run a coroutine for each of them.
+        // todo: check game moves it looks sometimes they choose a move which is not in available list
         generation.mapIndexed { index, gene->
             launch(context = Dispatchers.Default) {
                 // play the game
