@@ -12,12 +12,14 @@ const val VARIANCE_THRESHOLD = 0.3
 const val MIN_GENERATION_PRODUCTION = 5
 
 fun main() = runBlocking {
+    initLogger()
     val variances = ArrayList<Double>()
     var lastGeneration: ArrayList<Gene>? = null
 
     while (produceNextGeneration(variances, lastGeneration)) {
-        val generation = selectNextGeneration(lastGeneration)
         generationId++
+        val generation = selectNextGeneration(lastGeneration)
+        logGeneration(generation)
         generation.mapIndexed { index, gene->
             launch(context = Dispatchers.Default) {
                 // play the game
@@ -47,7 +49,8 @@ fun playWithGeneration(current: Gene, index: Int, generation: ArrayList<Gene>) {
         game.start()
 
         // add to each gene fitness
-        val (blackDisks, whiteDisks) = game.boardManager.getDisksCount()
+        val disksCount = game.boardManager.getDisksCount()
+        val (blackDisks, whiteDisks) = disksCount
         when {
             blackDisks > whiteDisks -> current.fitness.getAndAdd(3)
             blackDisks < whiteDisks -> generation[i].fitness.getAndAdd(3)
@@ -56,6 +59,7 @@ fun playWithGeneration(current: Gene, index: Int, generation: ArrayList<Gene>) {
                 generation[i].fitness.incrementAndGet()
             }
         }
+        logGame(current, generation[i], disksCount)
     }
 }
 
@@ -82,6 +86,9 @@ fun selectNextGeneration(genes: ArrayList<Gene>?): ArrayList<Gene> {
 fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
     val selection = ArrayList<Gene>()
     val sorted = genes.sortedBy {it.fitness.get() }
+
+    logRewardSelection(sorted)
+
     val sum = (sorted.size * (sorted.size+1))/2
 
     while (selection.size != GENERATION_SIZE) {
