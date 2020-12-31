@@ -2,7 +2,6 @@ package ai
 
 import game.*
 import java.util.stream.Collectors
-import kotlin.math.abs
 import kotlin.math.ceil
 
 
@@ -19,6 +18,11 @@ const val REDUCER_GIVING_CORNER = 3
 const val REDUCER_MOBILITY = 4
 const val REDUCER_CORNER_NEIGHBOR = 5
 
+
+const val NOT_EDGE = -1
+const val VERTICAL_EDGE = 0
+const val HORIZONTAL_EDGE = 1
+
 class MoveReducer(private val calculator: BoardCalculator, private val weights: DoubleArray) {
     private val corners = cornerCells()
 
@@ -30,20 +34,21 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
                 val c2Points = calculate(state, c2, turn)
                 val c1Points = calculate(state, c1, turn)
                 val sortValue = c2Points - c1Points
-                if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0}
-            .limit(getMovesLimit(moves.size,depth))
+                if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0
+            }
+            .limit(getMovesLimit(moves.size, depth))
             .collect(Collectors.toList())
     }
 
-    private fun getMovesLimit(size: Int, depth: Int): Long{
-        return if (depth == 0) ceil((size*3.0)/4.0).toLong()
+    private fun getMovesLimit(size: Int, depth: Int): Long {
+        return if (depth == 0) ceil((size * 3.0) / 4.0).toLong()
         else MOVE_LIMIT
     }
 
 
     private fun calculate(state: Array<Array<Side?>>, cell: Cell, side: Side): Double {
         return weights[REDUCER_CORNER] * cornerFeature(cell) +
-                weights[REDUCER_EDGE] * edgeFeature(state,cell) +
+                weights[REDUCER_EDGE] * edgeFeature(state, cell) +
                 weights[REDUCER_FLIP] * flipFeature(state, cell, side) +
                 weights[REDUCER_GIVING_CORNER] * givingCornerFeature(state, cell, side) +
                 weights[REDUCER_MOBILITY] * mobilityFeature(state, cell, side) +
@@ -83,10 +88,10 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     */
     private fun flipFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 5 to 10
         state[cell.x][cell.y] = turn
-        val flips = calculator.flipCellsAfterMove(state,cell).size
+        val flips = calculator.flipCellsAfterMove(state, cell).size
         state[cell.x][cell.y] = null // reset board to start value
-        return if (state.leftMoves() < 20) flips/ MAX_FLIP
-        else (MAX_FLIP - flips)/ MAX_FLIP
+        return if (state.leftMoves() < 20) flips / MAX_FLIP
+        else (MAX_FLIP - flips) / MAX_FLIP
     }
 
     private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 8 to 13
@@ -110,90 +115,59 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     }
 
     private fun cornerNeighborFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
-        TODO()
-    }
-
-    /* being in the C cells
-    */
-    private fun dangerCellsFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Int { // range 3 to 7
         val (corner, _) = nearestCornerTo(cell)
         val dangerCells = dangerCellOf(corner)
-        // if in dangerCells:
-        //      if has corner 1
-        //      else -1
-        // not in dangerCell 0
-        return if (cell in dangerCells) if (turn == state.getOrNull(corner.x,corner.y)) 1 else -1 else 0
+        val cornerDisk = state.getOrNull(corner.x, corner.y)
+        return if (cell in dangerCells) when (cornerDisk) {
+            turn -> 1.0 // same color
+            turn.flip() -> 0.0 // opposite color
+            else -> cornerWedge(corner, cell, turn, state) // corner is null
+        } else return when (isInEdges(cell)) {
+            HORIZONTAL_EDGE -> {
+                val neighbors = listOf(state.getOrNull(cell.x, cell.y - 1), state.getOrNull(cell.x, cell.y + 1))
+                return if (isWedge(neighbors, turn.flip())) 1.0 else 0.0
+            }
+            VERTICAL_EDGE -> {
+                val neighbors = listOf(state.getOrNull(cell.x - 1, cell.y), state.getOrNull(cell.x + 1, cell.y))
+                return if (isWedge(neighbors, turn.flip())) 1.0 else 0.0
+            }
+            else -> 0.0
+        }
     }
 
-    private fun wedgingFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 3 to 7
+    private fun cornerWedge(corner: Cell, cell: Cell, turn: Side, state: Array<Array<Side?>>): Double {
         val opponentSide = turn.flip()
-
-        when (cell) {
-            // top left corner
-            Cell(0, 1) -> {
-                if (state.getOrNull(0,0) == null && state.getOrNull(0,2) == opponentSide)
-                    return -1.0
+        return when (corner) {
+            Cell(0, 0) -> when (cell) {
+                // top left corner
+                Cell(0, 1) -> if (state.getOrNull(0, 2) == opponentSide) -1.0 else 0.0
+                Cell(1, 1) -> if (state.getOrNull(2, 2) == opponentSide) -1.0 else 0.0
+                Cell(1, 0) -> if (state.getOrNull(2, 0) == opponentSide) -1.0 else 0.0
+                else -> 0.0
             }
-            Cell(1, 1) -> {
-                if (state.getOrNull(0,0) == null && state.getOrNull(2,2) == opponentSide)
-                    return -1.0
+            Cell(0, 7) -> when (cell) {
+                // top right corner
+                Cell(0, 6) -> if (state.getOrNull(0, 5) == opponentSide) -1.0 else 0.0
+                Cell(1, 6) -> if (state.getOrNull(2, 5) == opponentSide) -1.0 else 0.0
+                Cell(1, 7) -> if (state.getOrNull(2, 7) == opponentSide) -1.0 else 0.0
+                else -> 0.0
             }
-            Cell(1, 0) -> {
-                if (state.getOrNull(0,0) == null && state.getOrNull(2,0) == opponentSide)
-                    return -1.0
+            Cell(7, 0) -> when (cell) {
+                // bottom left corner
+                Cell(6, 0) -> if (state.getOrNull(5, 0) == opponentSide) -1.0 else 0.0
+                Cell(6, 1) -> if (state.getOrNull(5, 2) == opponentSide) -1.0 else 0.0
+                Cell(7, 1) -> if (state.getOrNull(7, 2) == opponentSide) -1.0 else 0.0
+                else -> 0.0
             }
-            // top right corner
-            Cell(0, 6)->{
-                if (state.getOrNull(0,7) == null && state.getOrNull(0,5) == opponentSide)
-                    return -1.0
+            Cell(7, 7) -> when (cell) {
+                // bottom right corner
+                Cell(6, 6) -> if (state.getOrNull(5, 5) == opponentSide) -1.0 else 0.0
+                Cell(6, 7) -> if (state.getOrNull(5, 7) == opponentSide) -1.0 else 0.0
+                Cell(7, 6) -> if (state.getOrNull(7, 5) == opponentSide) -1.0 else 0.0
+                else -> 0.0
             }
-            Cell(1, 6)->{
-                if (state.getOrNull(0,7) == null && state.getOrNull(2,5) == opponentSide)
-                    return -1.0
-            }
-            Cell(1, 7)->{
-                if (state.getOrNull(0,7) == null && state.getOrNull(2,7) == opponentSide)
-                    return -1.0
-            }
-            // bottom left corner
-            Cell(6, 0)->{
-                if (state.getOrNull(7,0) == null && state.getOrNull(5,0) == opponentSide)
-                    return -1.0
-            }
-            Cell(6, 1)->{
-                if (state.getOrNull(7,0) == null && state.getOrNull(5,2) == opponentSide)
-                    return -1.0
-            }
-            Cell(7, 1)->{
-                if (state.getOrNull(7,0) == null && state.getOrNull(7,2) == opponentSide)
-                    return -1.0
-            }
-            // bottom right corner
-            Cell(6, 6)->{
-                if (state.getOrNull(7,7) == null && state.getOrNull(5,5) == opponentSide)
-                    return -1.0
-            }
-            Cell(6, 7)->{
-                if (state.getOrNull(7,7) == null && state.getOrNull(5,7) == opponentSide)
-                    return -1.0
-            }
-            Cell(7, 6)->{
-                if (state.getOrNull(7,7) == null && state.getOrNull(7,5) == opponentSide)
-                    return -1.0
-            }
+            else -> 0.0
         }
-
-
-
-        var neighbors: List<Side?>? = null
-        if (cell.x == 0 || cell.x == BOARD_SIZE - 1) {// in top or bottom edge
-            neighbors = listOf(state.getOrNull(cell.x, cell.y - 1), state.getOrNull(cell.x, cell.y + 1))
-        } else if (cell.y == 0 || cell.y == BOARD_SIZE - 1) { // in left or right edge
-            neighbors = listOf(state.getOrNull(cell.x - 1, cell.y), state.getOrNull(cell.x + 1, cell.y))
-        }
-
-
-        return if (isWedge(neighbors, opponentSide)) 1.0 else 0.0
     }
 
     private fun nearestCornerTo(cell: Cell): Pair<Cell, Int> {
@@ -251,6 +225,14 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     private fun isWedge(neighbors: List<Side?>?, side: Side): Boolean {
         if (neighbors == null) return false
         return neighbors.filterNotNull().filter { it == side }.size == 2
+    }
+
+    private fun isInEdges(cell: Cell): Int {
+        return when {
+            cell.x == 0 || cell.x == 7 -> HORIZONTAL_EDGE
+            cell.y == 0 || cell.y == 7 -> VERTICAL_EDGE
+            else -> NOT_EDGE
+        }
     }
 
 
