@@ -94,10 +94,10 @@ fun heuristicGene(): Gene {
             else -> 0.0
         }
     }
-    return Gene(geneId, generationId, weights)
+    return Gene(geneId++, generationId, weights)
 }
 
 fun randomGene(): Gene {
     val weights = DoubleArray(GENE_SIZE) { randNumber(1, 15) }
-    return Gene(geneId, generationId, weights)
+    return Gene(geneId++, generationId, weights)
 }
