@@ -29,15 +29,20 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
     fun reduce(moves: ArrayList<Cell>, state: Array<Array<Side?>>, depth: Int, turn: Side): List<Cell> {
         return if (depth == 1) moves
-        else moves.stream()
-            .sorted { c1, c2 ->
-                val c2Points = calculate(state, c2, turn)
-                val c1Points = calculate(state, c1, turn)
-                val sortValue = c2Points - c1Points
-                if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0
-            }
-            .limit(getMovesLimit(moves.size, depth))
-            .collect(Collectors.toList())
+        else {
+            val list = moves.stream()
+                .sorted { c1, c2 ->
+                    val c2Points = calculate(state, c2, turn)
+                    val c1Points = calculate(state, c1, turn)
+                    val sortValue = c2Points - c1Points
+                    if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0
+                }
+                .limit(getMovesLimit(moves.size, depth))
+                .collect(Collectors.toList())
+            list.shuffle()
+            list
+        }
+
     }
 
     private fun getMovesLimit(size: Int, depth: Int): Long {
