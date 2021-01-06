@@ -6,7 +6,7 @@ import game.Side
 import kotlinx.coroutines.*
 import kotlin.math.abs
 
-const val GENERATION_SIZE = 20
+const val GENERATION_SIZE = 4
 const val VARIANCE_CHECK = 4
 const val VARIANCE_THRESHOLD = 0.3
 const val MIN_GENERATION_PRODUCTION = 5
@@ -20,12 +20,14 @@ fun main() = runBlocking {
         generationId++
         val generation = selectNextGeneration(lastGeneration)
         logGeneration(generation)
-        // todo: create tuples of which gene play with which and run a coroutine for each of them.
+        val gamePool = createGamePool(generation.size)
         // todo: check game moves it looks sometimes they choose a move which is not in available list
-        generation.mapIndexed { index, gene->
+        gamePool.map { pair->
             launch(context = Dispatchers.Default) {
+                val g1 = generation[pair.first]
+                val g2 = generation[pair.second]
                 // play the game
-                playWithGeneration(gene,index,generation)
+                playWithGeneration(g1,g2)
             }
         }.joinAll()
 
@@ -35,15 +37,24 @@ fun main() = runBlocking {
 
 }
 
-fun playWithGeneration(current: Gene, index: Int, generation: ArrayList<Gene>) {
-    for (i in index+1 until generation.size) {
+fun createGamePool(size: Int): ArrayList<Pair<Int, Int>> {
+    val pool = ArrayList<Pair<Int, Int>>()
+
+    for (i in 0 until size)
+        for (j in i+1 until size)
+            pool.add(Pair(i,j))
+
+    return pool
+}
+
+fun playWithGeneration(current: Gene,opponent: Gene) {
 
         // create player for current gene
         val (currentFeatures, currentReducer) = separateWeights(current)
         val ai1 = AIPlayer(Side.BLACK,currentFeatures,currentReducer)
 
         // create player for other gene
-        val (iFeatures, iReducer) = separateWeights(generation[i])
+        val (iFeatures, iReducer) = separateWeights(opponent)
         val ai2 = AIPlayer(Side.WHITE,iFeatures,iReducer)
 
         // start the game
@@ -53,16 +64,16 @@ fun playWithGeneration(current: Gene, index: Int, generation: ArrayList<Gene>) {
         // add to each gene fitness
         val disksCount = game.boardManager.getDisksCount()
         val (blackDisks, whiteDisks) = disksCount
+        val difference = (abs(blackDisks-whiteDisks)/64.0) * 3
         when {
-            blackDisks > whiteDisks -> current.fitness.getAndAdd(3)
-            blackDisks < whiteDisks -> generation[i].fitness.getAndAdd(3)
+            blackDisks > whiteDisks -> current.fitness.getAndUpdate{it+3+difference}
+            blackDisks < whiteDisks -> opponent.fitness.getAndUpdate{it+3+difference}
             else -> {
-                current.fitness.incrementAndGet()
-                generation[i].fitness.incrementAndGet()
+                current.fitness.getAndUpdate{it+1}
+                opponent.fitness.getAndUpdate{it+1}
             }
         }
-        logGame(current, generation[i], disksCount)
-    }
+        logGame(current, opponent, disksCount)
 }
 
 fun produceNextGeneration(variances: ArrayList<Double>, genes: ArrayList<Gene>?): Boolean {
@@ -82,7 +93,11 @@ fun selectNextGeneration(genes: ArrayList<Gene>?): ArrayList<Gene> {
         val generation = initialGeneration(GENERATION_SIZE)
         generation.addAll(generateChildren(generation))
         generation
-    }else rewardSelection(genes) // produce from lastGeneration
+    }else {
+        val rewardSelection = rewardSelection(genes)
+        rewardSelection.addAll(generateChildren(rewardSelection))
+        rewardSelection
+    } // produce from lastGeneration
 }
 
 fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
@@ -91,16 +106,16 @@ fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
 
     logRewardSelection(sorted)
 
-    val sum = (sorted.size * (sorted.size+1))/2
+    val sum = (sorted.size * (sorted.size+1))/2.0
 
     while (selection.size != GENERATION_SIZE) {
         val rand = randNumber()
         for (i in sorted.size downTo 1) {
             val prob = (i*(i-1))/(2*sum)
             if (rand > prob){
-                if (genes[i].selected) break
-                genes[i].selected = true
-                selection.add(genes[i])
+                if (genes[i-1].selected) break
+                genes[i-1].selected = true
+                selection.add(genes[i-1])
                 break
             }
         }
@@ -108,7 +123,7 @@ fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
 
     selection.forEach {
         it.selected = false
-        it.fitness.set(0)
+        it.fitness.set(0.0)
     }
 
     return selection
@@ -121,9 +136,9 @@ fun separateWeights(gene: Gene): Pair<DoubleArray,DoubleArray> {
 }
 
 fun variance(genes: ArrayList<Gene>): Double {
-    val fits = genes.stream().mapToInt { it.fitness.get() }
-    val sum_x2 = fits.reduce{ acc, fit -> acc +fit*fit }.asInt * 1.0
-    var sumx_2 = fits.reduce{ acc, fit -> acc +fit }.asInt * 1.0
+    val fits = genes.stream().mapToDouble { it.fitness.get() }
+    val sum_x2 = fits.reduce{ acc, fit -> acc +fit*fit }.asDouble
+    var sumx_2 = fits.reduce{ acc, fit -> acc +fit }.asDouble
     sumx_2 *= sumx_2
 
 
