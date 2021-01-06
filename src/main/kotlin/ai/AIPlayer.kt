@@ -11,24 +11,21 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
     private val utility = Utility(boardCalculator, featureWeights)
     private val moveReducer = MoveReducer(boardCalculator, moveReducerWeights)
 
-    init {
-        featureWeights[4] = 10.0 // corner feature
-        moveReducerWeights[0] = 5.0 // isCorner feature
-    }
-
     override fun move(state: Array<Array<Side?>>, availableCells: List<Cell>): Cell {
 
 
         val boundary = doubleArrayOf(Double.MIN_VALUE, Double.MAX_VALUE)// alpha beta
         var bestPoint = Double.MIN_VALUE
         var bestMove = Cell(-1, -1)
-        moveReducer.reduce(availableCells as ArrayList<Cell>,state,1,playerTurn).forEach {
-            val each = maxValue(state, boundary, it, playerTurn, 1)
-            if (each > bestPoint) {
-                bestPoint = each
-                bestMove = it
+        moveReducer
+            .reduce(availableCells as ArrayList<Cell>, state, 1, playerTurn)
+            .forEach {
+                val each = maxValue(state, boundary, it, playerTurn, 1)
+                if (each >= bestPoint) {
+                    bestPoint = each
+                    bestMove = it
+                }
             }
-        }
 
         return bestMove
     }
@@ -44,23 +41,40 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
         //play the move
         val flippedCells = state.play(cell, turn, boardCalculator)
 
-        if (isTerminalState(state, depth)){
-            val utility =  utility.calculate(state, turn)
+        if (isTerminalState(state, depth)) {
+            val utility = utility.calculate(state, turn)
             state.undoMove(cell, flippedCells)
             return utility
         }
 
         val opponent: Side = turn.flip()
-        var bestPoint = Double.MIN_VALUE
-        val availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent),state,depth,opponent)
-        availableCells.forEach {
-            bestPoint = max(bestPoint, minValue(state, boundary, it, opponent, depth + 1))
-            if (bestPoint >= boundary[1]) { // if bestPoint >= beta return bestPoint
-                state.undoMove(cell, flippedCells)
-                return bestPoint
+        var bestPoint: Double
+        var availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent), state, depth, opponent)
+
+        if (availableCells.isNotEmpty()) {
+            bestPoint = Double.MIN_VALUE
+            availableCells.forEach {
+                bestPoint = max(bestPoint, minValue(state, boundary, it, opponent, depth + 1))
+                if (bestPoint >= boundary[1]) { // if bestPoint >= beta return bestPoint
+                    state.undoMove(cell, flippedCells)
+                    return bestPoint
+                }
+                boundary[0] = max(boundary[0], bestPoint) // alpha = max(alpha,bestPoint)
             }
-            boundary[0] = max(boundary[0], bestPoint) // alpha = max(alpha,bestPoint)
         }
+        else {
+            bestPoint = Double.MAX_VALUE
+            availableCells = moveReducer.reduce(boardCalculator.availableCells(state, turn),state, depth, turn)
+            availableCells.forEach {
+                bestPoint = min(bestPoint, maxValue(state, boundary, it, turn, depth + 1))
+                if (bestPoint <= boundary[0]) { // if bestPoint <= alpha return bestPoint
+                    state.undoMove(cell, flippedCells)
+                    return bestPoint
+                }
+                boundary[1] = min(boundary[1], bestPoint) // alpha = min(beta,bestPoint)
+            }
+        }
+
 
         state.undoMove(cell, flippedCells)
 
@@ -85,16 +99,33 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
 
 
         val opponent: Side = turn.flip()
-        var bestPoint = Double.MAX_VALUE
-        val availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent),state,depth,opponent)
-        availableCells.forEach {
-            bestPoint = min(bestPoint, maxValue(state, boundary, it, opponent, depth + 1))
-            if (bestPoint <= boundary[0]) { // if bestPoint <= alpha return bestPoint
-                state.undoMove(cell, flippedCells)
-                return bestPoint
+        var bestPoint: Double
+        var availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent), state, depth, opponent)
+
+        if (availableCells.isNotEmpty()) {
+            bestPoint = Double.MAX_VALUE
+            availableCells.forEach {
+                bestPoint = min(bestPoint, maxValue(state, boundary, it, opponent, depth + 1))
+                if (bestPoint <= boundary[0]) { // if bestPoint <= alpha return bestPoint
+                    state.undoMove(cell, flippedCells)
+                    return bestPoint
+                }
+                boundary[1] = min(boundary[1], bestPoint) // alpha = min(beta,bestPoint)
             }
-            boundary[1] = min(boundary[1], bestPoint) // alpha = min(beta,bestPoint)
         }
+        else {
+            bestPoint = Double.MIN_VALUE
+            availableCells = moveReducer.reduce(boardCalculator.availableCells(state, turn),state, depth, turn)
+            availableCells.forEach {
+                bestPoint = max(bestPoint, minValue(state, boundary, it, turn, depth + 1))
+                if (bestPoint >= boundary[1]) { // if bestPoint >= beta return bestPoint
+                    state.undoMove(cell, flippedCells)
+                    return bestPoint
+                }
+                boundary[0] = max(boundary[0], bestPoint) // alpha = max(alpha,bestPoint)
+            }
+        }
+
 
         state.undoMove(cell, flippedCells)
 
