@@ -20,7 +20,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
 
     fun calculate(state: Array<Array<Side?>>, side: Side): Double {
         return weights[FEATURE_DISK_DIFFERENCE] * disksDifferenceFeature(state, side) +
-                weights[FEATURE_MOBILITY] * mobilityFeature(state,side) +
+                weights[FEATURE_MOBILITY] * mobilityFeature(state, side) +
                 weights[FEATURE_POTENTIAL_MOBILITY] * potentialMobilityFeature(state, side) +
                 weights[FEATURE_CORNER] * cornerFeature(state, side) +
                 weights[FEATURE_PARITY] * parityFeature(state, side) +
@@ -66,100 +66,252 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
         return if (leftMoves % 2 == 0) 1.0 else 0.0
     }
 
+
     private fun stableDisksFeature(state: Array<Array<Side?>>, side: Side): Double { // range 10 to 15
-//        val turnCells = arrayListOf<Cell>()
-//        val stableCells = arrayListOf<Cell>()
-//        val unstableCells = arrayListOf<Cell>()
-//        val opponentMoveCells = calculator.availableCells(state , side.flip())
-//
-//        for ( row in state.indices){
-//            for (col in state.indices){
-//                if(state[row][col] == side ) {
-//                    turnCells.add(Cell(row, col))
-//                }
-//            }
-//        }
-//
-//        for (i in opponentMoveCells.indices){
-//            var copyBoard =state.copy()
-//            copyBoard.play(opponentMoveCells[i] , side.flip() , calculator)
-//            for (j in turnCells.indices){
-//                if (copyBoard[turnCells[j].x][turnCells[j].y] == side
-//                    && copyBoard[turnCells[j].x][turnCells[j].y] != null){
-//                    if (!stableCells.contains(turnCells[j])) {
-//                        stableCells.add(turnCells[j])
-//                    }
-//                }else if (copyBoard[turnCells[j].x][turnCells[j].y] == side.flip()
-//                    && copyBoard[turnCells[j].x][turnCells[j].y] != null){
-//                    unstableCells.add(turnCells[j])
-//                }
-//            }
-//        }
-        //return stableCells
-        return 0.0
+
+        val visitedCells = Array(state.size){BooleanArray(state.size)}
+        val stableCells = arrayListOf<Cell>()
+
+        //leftUp
+        for (i in state.indices) {
+            if (state[i][0] == side) {
+                for (j in state.indices) {
+                    if ((state[i][j] == side && !visitedCells[i][j]) &&
+                            ((i == 0) || (j == 0) )) {
+                        visitedCells[i][j] = true
+                        stableCells.add(Cell(i, j))
+                        continue
+                    }else if (state[i][j] == side && !visitedCells[i][j]){
+                        if (checkUp(state , side , i , j ) &&
+                                checkLeftUp(state , side , i , j) &&
+                                checkLeft(state , side , i , j) &&
+                                (checkLeftDown(state , side , i , j) || checkRightUp(state , side , i , j))) {
+
+                            visitedCells[i][j] = true
+                            stableCells.add(Cell(i, j))
+                            continue
+                        }
+                    } else {
+                        visitedCells[i][j] = true
+                        break
+                    }
+                }
+            } else {
+                visitedCells[i][0] = true
+                break
+            }
+        }
+
+        //rightUp
+        for (i in state.indices) {
+            if (state[i][state.size-1] == side) {
+                for (j in state.size-1 downTo 0) {
+                    if ((state[i][j] == side && !visitedCells[i][j]) &&
+                            ((i == 0) || (j == state.size-1) )) {
+                        visitedCells[i][j] = true
+                        stableCells.add(Cell(i, j))
+                        continue
+                    }else if (state[i][j] == side && !visitedCells[i][j]){
+                        if (checkUp(state , side , i , j ) &&
+                                checkRightUp(state , side , i , j) &&
+                                checkRight(state , side , i , j) &&
+                                (checkLeftUp(state , side , i , j) || checkRightDown(state , side , i , j))) {
+
+                            visitedCells[i][j] = true
+                            stableCells.add(Cell(i, j))
+                            continue
+                        }
+                    } else {
+                        visitedCells[i][j] = true
+                        break
+                    }
+                }
+            } else {
+                visitedCells[i][state.size-1] = true
+                break
+            }
+        }
+        //leftDown
+        for (i in state.size-1 downTo 0) {
+            if (state[i][0] == side) {
+                for (j in state.indices) {
+                    if ((state[i][j] == side && !visitedCells[i][j]) &&
+                            ((i == state.size-1) || (j == 0) )) {
+                        visitedCells[i][j] = true
+                        stableCells.add(Cell(i, j))
+                        continue
+                    }else if (state[i][j] == side && !visitedCells[i][j]){
+                        if (checkDown(state , side , i , j ) &&
+                                checkLeftDown(state , side , i , j) &&
+                                checkLeft(state , side , i , j) &&
+                                (checkLeftUp(state , side , i , j) || checkRightDown(state , side , i , j))) {
+
+                            visitedCells[i][j] = true
+                            stableCells.add(Cell(i, j))
+                            continue
+                        }
+                    } else {
+                        visitedCells[i][j] = true
+                        break
+                    }
+                }
+            } else {
+                visitedCells[i][0] = true
+                break
+            }
+        }
+        //rightDown
+        for (i in state.size-1 downTo 0) {
+            if (state[i][state.size-1] == side) {
+                for (j in state.size-1 downTo 0) {
+                    if ((state[i][j] == side && !visitedCells[i][j]) &&
+                            ((i == state.size-1) || (j == state.size-1) )) {
+                        visitedCells[i][j] = true
+                        stableCells.add(Cell(i, j))
+                        continue
+                    }else if (state[i][j] == side && !visitedCells[i][j]){
+                        if (checkDown(state , side , i , j ) &&
+                                checkRightDown(state , side , i , j) &&
+                                checkRight(state , side , i , j) &&
+                                (checkRightUp(state , side , i , j) || checkLeftDown(state , side , i , j))) {
+
+                            visitedCells[i][j] = true
+                            stableCells.add(Cell(i, j))
+                            continue
+                        }
+                    } else {
+                        visitedCells[i][j] = true
+                        break
+                    }
+                }
+            } else {
+                visitedCells[i][state.size-1] = true
+                break
+            }
+        }
+//    stableCells.distinct().forEach {
+//        println("x : "+it.x + " || y : "+it.y)
+//    }
+        return stableCells.size.toDouble()
     }
 
     private fun cornerCells(): Array<Cell> {
         return arrayOf(
-            Cell(0, 0),
-            Cell(0, 7),
-            Cell(7, 0),
-            Cell(7, 7)
+                Cell(0, 0),
+                Cell(0, 7),
+                Cell(7, 0),
+                Cell(7, 7)
         )
     }
 
-    private fun check_stability_in8direction(s: Array<Array<Side?>>, row: Int, col: Int):Boolean {
-        var i = row
-        var j = col
-        while ( j-- >= 0 && col != 0 ){         //left
-            if ( s[row][j]==null)
-                return false
+
+    fun checkUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var i = x
+        while (i >= 0) {
+            if (i == 0 && state[i][y]==side) {
+                return true
+            }
+            if (state[i][y]!=side) {
+                break
+            }
+            i--
         }
-        i = row
-        j = col
-        while ( j++ <= 7 && col != 7 ){         //right
-            if ( s[row][j]==null)
-                return false
+        return false
+    }
+    fun checkDown(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var i = x
+        while (i < state.size) {
+            if (i == state.size-1 && state[i][y]==side)
+                return true
+            if (state[i][y]!=side)
+                break
+            i++
         }
-        i = row
-        j = col
-        while ( i-- >= 0 && row != 0 ){         //up
-            if ( s[row][j]==null)
-                return false
+        return false
+    }
+    fun checkLeft(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var j = y
+        while (j >= 0) {
+            if (j == 0 && state[x][j]==side){
+                return true
+            }
+            if (state[x][j]!=side) {
+                break
+            }
+            j--
         }
-        i = row
-        j = col
-        while ( i-- >= 0 && row != 7 ){         //down
-            if ( s[row][j]==null)
-                return false
+        return false
+    }
+    fun checkRight(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var j = y
+        while (j < state.size) {
+            if (j == state.size-1 && state[x][j]==side)
+                return true
+            if (state[x][j]!=side)
+                break
+            j++
         }
-        i = row
-        j = col
-        while ( j-- >= 0 && col != 0 && i-- >= 0 && row != 0 ){         //left-up
-            if ( s[row][j]==null)
-                return false
+        return false
+    }
+    fun checkRightUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var j = y
+        var i = x
+        while (i >= 0 && j<state.size) {
+            if ((j == state.size-1 && state[i][j]==side) || (i == 0 && state[i][j]==side) ) {
+                return true
+            }
+            if (state[i][j]!=side) {
+                break
+            }
+            j++
+            i--
         }
-        i = row
-        j = col
-        while ( j++ <= 7 && col != 7 && i-- >= 0 && row != 0  ){         //right-up
-            if ( s[row][j]==null)
-                return false
-        }
-        i = row
-        j = col
-        while ( j-- >= 0 && col != 0 &&  i++ >= 0 && row != 7 ){         //left-down
-            if ( s[row][j]==null)
-                return false
-        }
-        i = row
-        j = col
-        while ( j++ <= 7 && col != 7 &&  i++ >= 0 && row != 7){         //right-down
-            if ( s[row][j]==null)
-                return false
-        }
-        return true
+        return false
     }
 
+    fun checkRightDown(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var j = y
+        var i = x
+        while (i <state.size && j<state.size) {
+            if ((j == state.size-1 && state[i][j]==side) || (i == state.size-1 && state[i][j]==side) )
+                return true
+            if (state[i][j]!=side)
+                break
+            j++
+            i++
+        }
+        return false
+    }
 
+    fun checkLeftUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+        var j = y
+        var i = x
+        while (i >= 0 && j >= 0 ) {
+            if ((j == 0 && state[i][j]==side) || (i == 0 && state[i][j]==side) ){
+                return true
+            }
+            if (state[i][j]!=side){
+                break
+            }
+            j--
+            i--
+        }
+        return false
+    }
+    fun checkLeftDown(state: Array<Array<Side?>>, side: Side, x : Int, y :Int): Boolean {
+        var j = y
+        var i = x
+        while (i < state.size && j >= 0) {
+            if ((i == state.size-1 && state[i][j]==side) || (j == 0 && state[i][j]==side) ) {
+                return true
+            }
+            if (state[i][j]!=side) {
+                break
+            }
+            j--
+            i++
+        }
+        return false
+    }
 
 }
