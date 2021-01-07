@@ -217,7 +217,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
 //    stableCells.distinct().forEach {
 //        println("x : "+it.x + " || y : "+it.y)
 //    }
-        return stableCells.size.toDouble()
+        return stableCells.size.toDouble()/64
     }
 
     private fun cornerCells(): Array<Cell> {
