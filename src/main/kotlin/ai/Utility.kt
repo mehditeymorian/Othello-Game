@@ -195,44 +195,19 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
             for( j in visitedCells.indices){
                 if (!visitedCells[i][j] && state[i][j]==side){
                     if (i==0 || i==visitedCells.size-1){
-                        var end = j
-                        while (state[i][end]==side){
-                            visitedCells[i][end] = true
-                            end ++
-                        }
-                        if (state[i][end]!= null && checkRight(state , side.flip() , i , end) &&
-                                state[i][j-1]!= null && checkRight(state , side.flip() , i , j-1)){
-                            for (k in j..end){
-                                stableCells.add(Cell(i , k))
-                            }
+                        if (isFillLeft(state , i , j) && isFillRight(state , i , j)){
+                            stableCells.add(Cell(i,j))
                         }
                     }
                     else if ( j==0 || j==visitedCells.size-1 ){
-                        var end = i
-                        while (state[end][j]==side){
-                            visitedCells[end][j] = true
-                            end ++
-                        }
-                        if (state[end][j]!= null && checkRight(state , side.flip() , end , j) &&
-                                state[i-1][j]!= null && checkRight(state , side.flip() , i-1 , j)){
-                            for (k in i..end){
-                                stableCells.add(Cell(k , j))
-                            }
+                        if (isFillDown(state, i , j) && isFillUp(state , i , j)){
+                            stableCells.add(Cell(i,j))
                         }
                     }else{
-                        var end = j
-                        while (state[i][end]==side && end<7){
-                            visitedCells[i][end] = true
-                            end ++
-                        }
-                        if (checkUp(state , side.flip() , i-1 , j)&&
-                                checkLeft(state , side.flip() , i , j-1)&&
-                                checkRight(state , side.flip() , i , j+1)&&
-                                checkDown(state , side.flip() , i+1 , j) &&
-                                checkRightUp(state , side.flip() , i-1 , j+1)&&
-                                checkRightDown(state , side.flip() , i+1 , j+1)&&
-                                checkLeftUp(state , side.flip() , i-1 , j-1)&&
-                                checkLeftDown(state , side.flip() , i+1 , j-1)){
+                        if (isFillUp(state,i,j)&&isFillDown(state,i,j)&&isFillRight(state,i,j)&&
+                                isFillLeft(state,i,j)&& isFillRightUp(state,i,j)&& isFillLeftUp(state,i,j)&&
+                                isFillLeftDown(state,i,j)&& isFillRightDown(state,i,j)){
+
                             stableCells.add(Cell(i,j))
                         }
                     }
@@ -254,114 +229,5 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
         )
     }
 
-
-    fun checkUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var i = x
-        while (i >= 0) {
-            if (i == 0 && state[i][y]==side) {
-                return true
-            }
-            if (state[i][y]!=side) {
-                break
-            }
-            i--
-        }
-        return false
-    }
-    fun checkDown(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var i = x
-        while (i < state.size) {
-            if (i == state.size-1 && state[i][y]==side)
-                return true
-            if (state[i][y]!=side)
-                break
-            i++
-        }
-        return false
-    }
-    fun checkLeft(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var j = y
-        while (j >= 0) {
-            if (j == 0 && state[x][j]==side){
-                return true
-            }
-            if (state[x][j]!=side) {
-                break
-            }
-            j--
-        }
-        return false
-    }
-    fun checkRight(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var j = y
-        while (j < state.size) {
-            if (j == state.size-1 && state[x][j]==side)
-                return true
-            if (state[x][j]!=side)
-                break
-            j++
-        }
-        return false
-    }
-    fun checkRightUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var j = y
-        var i = x
-        while (i >= 0 && j<state.size) {
-            if ((j == state.size-1 && state[i][j]==side) || (i == 0 && state[i][j]==side) ) {
-                return true
-            }
-            if (state[i][j]!=side) {
-                break
-            }
-            j++
-            i--
-        }
-        return false
-    }
-
-    fun checkRightDown(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var j = y
-        var i = x
-        while (i <state.size && j<state.size) {
-            if ((j == state.size-1 && state[i][j]==side) || (i == state.size-1 && state[i][j]==side) )
-                return true
-            if (state[i][j]!=side)
-                break
-            j++
-            i++
-        }
-        return false
-    }
-
-    fun checkLeftUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
-        var j = y
-        var i = x
-        while (i >= 0 && j >= 0 ) {
-            if ((j == 0 && state[i][j]==side) || (i == 0 && state[i][j]==side) ){
-                return true
-            }
-            if (state[i][j]!=side){
-                break
-            }
-            j--
-            i--
-        }
-        return false
-    }
-    fun checkLeftDown(state: Array<Array<Side?>>, side: Side, x : Int, y :Int): Boolean {
-        var j = y
-        var i = x
-        while (i < state.size && j >= 0) {
-            if ((i == state.size-1 && state[i][j]==side) || (j == 0 && state[i][j]==side) ) {
-                return true
-            }
-            if (state[i][j]!=side) {
-                break
-            }
-            j--
-            i++
-        }
-        return false
-    }
 
 }

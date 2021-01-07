@@ -91,3 +91,178 @@ fun manhattanDistance(c1: Cell, c2: Cell): Int {
     return abs(c1.x - c2.x) + abs(c1.y - c2.y)
 }
 
+
+
+fun checkUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var i = x
+    while (i >= 0) {
+        if (i == 0 && state[i][y]==side) {
+            return true
+        }
+        if (state[i][y]!=side) {
+            break
+        }
+        i--
+    }
+    return false
+}
+fun checkDown(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var i = x
+    while (i < state.size) {
+        if (i == state.size-1 && state[i][y]==side)
+            return true
+        if (state[i][y]!=side)
+            break
+        i++
+    }
+    return false
+}
+fun checkLeft(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var j = y
+    while (j >= 0) {
+        if (j == 0 && state[x][j]==side){
+            return true
+        }
+        if (state[x][j]!=side) {
+            break
+        }
+        j--
+    }
+    return false
+}
+fun checkRight(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var j = y
+    while (j < state.size) {
+        if (j == state.size-1 && state[x][j]==side)
+            return true
+        if (state[x][j]!=side)
+            break
+        j++
+    }
+    return false
+}
+fun checkRightUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var j = y
+    var i = x
+    while (i >= 0 && j<state.size) {
+        if ((j == state.size-1 && state[i][j]==side) || (i == 0 && state[i][j]==side) ) {
+            return true
+        }
+        if (state[i][j]!=side) {
+            break
+        }
+        j++
+        i--
+    }
+    return false
+}
+
+fun checkRightDown(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var j = y
+    var i = x
+    while (i <state.size && j<state.size) {
+        if ((j == state.size-1 && state[i][j]==side) || (i == state.size-1 && state[i][j]==side) )
+            return true
+        if (state[i][j]!=side)
+            break
+        j++
+        i++
+    }
+    return false
+}
+
+fun checkLeftUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
+    var j = y
+    var i = x
+    while (i >= 0 && j >= 0 ) {
+        if ((j == 0 && state[i][j]==side) || (i == 0 && state[i][j]==side) ){
+            return true
+        }
+        if (state[i][j]!=side){
+            break
+        }
+        j--
+        i--
+    }
+    return false
+}
+fun checkLeftDown(state: Array<Array<Side?>>, side: Side, x : Int, y :Int): Boolean {
+    var j = y
+    var i = x
+    while (i < state.size && j >= 0) {
+        if ((i == state.size-1 && state[i][j]==side) || (j == 0 && state[i][j]==side) ) {
+            return true
+        }
+        if (state[i][j]!=side) {
+            break
+        }
+        j--
+        i++
+    }
+    return false
+}
+
+fun isFillLeft(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (j in y downTo 0){
+        if (state[x][j]==null)
+            return false
+    }
+    return true
+}
+fun isFillRight(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (j in y until state.size){
+        if (state[x][j]==null)
+            return false
+    }
+    return true
+}
+fun isFillUp(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (i in x downTo 0){
+        if (state[i][y]==null)
+            return false
+    }
+    return true
+}
+fun isFillDown(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (i in x until state.size){
+        if (state[i][y]==null)
+            return false
+    }
+    return true
+}
+fun isFillLeftUp(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (i in x downTo 0){
+        for (j in y downTo 0){
+            if (state[i][j]==null)
+                return false
+        }
+    }
+    return true
+}
+fun isFillLeftDown(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (i in x until state.size){
+        for (j in y downTo 0){
+            if (state[i][j]==null)
+                return false
+        }
+    }
+    return true
+}
+fun isFillRightUp(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (i in x downTo 0){
+        for (j in y until state.size){
+            if (state[i][j]==null)
+                return false
+        }
+    }
+    return true
+}
+fun isFillRightDown(state: Array<Array<Side?>> , x : Int, y :Int): Boolean {
+    for (i in x until state.size){
+        for (j in y until state.size){
+            if (state[i][j]==null)
+                return false
+        }
+    }
+    return true
+}
