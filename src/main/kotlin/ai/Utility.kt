@@ -189,6 +189,56 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
                 break
             }
         }
+
+        //handle many turn side between opposite sides -->fixed
+        for( i in visitedCells.indices){
+            for( j in visitedCells.indices){
+                if (!visitedCells[i][j] && state[i][j]==side){
+                    if (i==0 || i==visitedCells.size-1){
+                        var end = j
+                        while (state[i][end]==side){
+                            visitedCells[i][end] = true
+                            end ++
+                        }
+                        if (state[i][end]!= null && checkRight(state , side.flip() , i , end) &&
+                                state[i][j-1]!= null && checkRight(state , side.flip() , i , j-1)){
+                            for (k in j..end){
+                                stableCells.add(Cell(i , k))
+                            }
+                        }
+                    }
+                    else if ( j==0 || j==visitedCells.size-1 ){
+                        var end = i
+                        while (state[end][j]==side){
+                            visitedCells[end][j] = true
+                            end ++
+                        }
+                        if (state[end][j]!= null && checkRight(state , side.flip() , end , j) &&
+                                state[i-1][j]!= null && checkRight(state , side.flip() , i-1 , j)){
+                            for (k in i..end){
+                                stableCells.add(Cell(k , j))
+                            }
+                        }
+                    }else{
+                        var end = j
+                        while (state[i][end]==side && end<7){
+                            visitedCells[i][end] = true
+                            end ++
+                        }
+                        if (checkUp(state , side.flip() , i-1 , j)&&
+                                checkLeft(state , side.flip() , i , j-1)&&
+                                checkRight(state , side.flip() , i , j+1)&&
+                                checkDown(state , side.flip() , i+1 , j) &&
+                                checkRightUp(state , side.flip() , i-1 , j+1)&&
+                                checkRightDown(state , side.flip() , i+1 , j+1)&&
+                                checkLeftUp(state , side.flip() , i-1 , j-1)&&
+                                checkLeftDown(state , side.flip() , i+1 , j-1)){
+                            stableCells.add(Cell(i,j))
+                        }
+                    }
+                }
+            }
+        }
 //    stableCells.distinct().forEach {
 //        println("x : "+it.x + " || y : "+it.y)
 //    }

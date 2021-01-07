@@ -1,8 +1,5 @@
 import ai.AIPlayer
-import game.Game
-import game.HumanPlayer
-import game.Player
-import game.Side
+import game.*
 
 fun main() {
 
@@ -23,8 +20,6 @@ fun main() {
             player2 = HumanPlayer(Side.WHITE)
         }
     }
-
     val game = Game(player1,player2)
     game.start()
 }
-
