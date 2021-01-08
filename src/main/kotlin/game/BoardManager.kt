@@ -1,5 +1,7 @@
 package game
 
+import java.lang.StringBuilder
+
 class BoardManager(private val eventListener: BoardEventListener) {
     private val calculator : BoardCalculator = BoardCalculator()
     var state: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
@@ -60,18 +62,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
     }
 
     fun printBoard() {
-        println("===========================")
-        print("   ")
-        for (i in 0..7) print(" $i ")
-        println()
-        var i = 0
-        state.forEach {
-            print(" $i ")
-            it.forEach { side: Side? -> print(if (side == null) "   " else if (side == Side.BLACK) " B " else " W ") }
-            println()
-            i++
-        }
-        println("===========================")
+        println(toString())
     }
 
 
@@ -105,5 +96,22 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
     fun getDisksCount(): Pair<Int, Int> {
         return calculator.getDisksCount()
+    }
+
+    override fun toString(): String {
+        val builder = StringBuilder()
+        builder.append("===========================\n")
+        builder.append("   ")
+        for (i in 0..7) builder.append(" ${'A'+i} ")
+        builder.append("\n")
+        var i = 0
+        state.forEach {
+            builder.append(" ${i+1} ")
+            it.forEach { side: Side? -> builder.append(if (side == null) "   " else if (side == Side.BLACK) " B " else " W ") }
+            builder.append("\n")
+            i++
+        }
+        builder.append("===========================\n")
+        return builder.toString()
     }
 }
