@@ -126,7 +126,7 @@ fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
         it.fitness.set(0.0)
     }
 
-    return selection.takeLast(GENERATION_SIZE) as ArrayList<Gene>
+    return sorted.takeLast(GENERATION_SIZE) as ArrayList<Gene>
 }
 
 fun separateWeights(gene: Gene): Pair<DoubleArray,DoubleArray> {
