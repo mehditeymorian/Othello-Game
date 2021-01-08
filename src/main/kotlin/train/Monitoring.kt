@@ -23,13 +23,23 @@ fun logRewardSelection(genes: List<Gene>) {
     }
 }
 
-fun logGame(gene1: Gene, gene2: Gene, disks: Pair<Int, Int>) {
+fun logGame(gene1: Gene, gene2: Gene, disks: Pair<Int, Int>, board: String) {
     val result = StringBuilder()
     result.append("Black $gene1\n")
     result.append("White $gene2\n")
     result.append("Black: ${disks.first} - White: ${disks.second}\n")
     result.append("${"=".repeat(40)}\n")
+    result.append(board)
     log("Game ${gene1.id} - ${gene2.id}",result.toString())
+}
+
+fun logVariance(variance: Double, avg: Double) {
+    val folder = File(BASE_ADDRESS)
+    if (folder.exists().not()) folder.mkdir()
+    val file = File("${BASE_ADDRESS}variances.txt")
+    if (file.exists().not()) file.createNewFile()
+
+    file.appendText("Generation $generationId - AVG: $avg - Variance $variance\n")
 }
 
 private fun log(fileName: String, line: String) {
@@ -43,3 +53,4 @@ private fun log(fileName: String, line: String) {
     }
 
 }
+
