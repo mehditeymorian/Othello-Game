@@ -6,9 +6,9 @@ import game.Side
 import kotlinx.coroutines.*
 import kotlin.math.abs
 
-const val GENERATION_SIZE = 4
+const val GENERATION_SIZE = 12
 const val VARIANCE_CHECK = 4
-const val VARIANCE_THRESHOLD = 0.3
+const val VARIANCE_THRESHOLD = 0.05
 const val MIN_GENERATION_PRODUCTION = 5
 
 fun main() = runBlocking {
@@ -21,7 +21,6 @@ fun main() = runBlocking {
         val generation = selectNextGeneration(lastGeneration)
         logGeneration(generation)
         val gamePool = createGamePool(generation.size)
-        // todo: check game moves it looks sometimes they choose a move which is not in available list
         gamePool.map { pair->
             launch(context = Dispatchers.Default) {
                 val g1 = generation[pair.first]
@@ -73,19 +72,20 @@ fun playWithGeneration(current: Gene,opponent: Gene) {
                 opponent.fitness.getAndUpdate{it+1}
             }
         }
-        logGame(current, opponent, disksCount)
+        logGame(current, opponent, disksCount, game.boardManager.toString())
 }
 
 fun produceNextGeneration(variances: ArrayList<Double>, genes: ArrayList<Gene>?): Boolean {
-    if (genes == null || variances.size < MIN_GENERATION_PRODUCTION) return true
+    if (genes == null) return true
 
     val newVariance = variance(genes)
-    val sum = variances.takeLast(VARIANCE_CHECK).sum() / VARIANCE_CHECK
-    if (abs(sum-newVariance) < VARIANCE_THRESHOLD) return false
+    val avg = variances.takeLast(VARIANCE_CHECK).sum() / VARIANCE_CHECK
+    val threshold = avg * VARIANCE_THRESHOLD
 
     variances.add(newVariance)
+    logVariance(newVariance,avg)
 
-    return true
+    return variances.size < MIN_GENERATION_PRODUCTION || abs(avg-newVariance) > threshold
 }
 
 fun selectNextGeneration(genes: ArrayList<Gene>?): ArrayList<Gene> {
@@ -106,27 +106,27 @@ fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
 
     logRewardSelection(sorted)
 
-    val sum = (sorted.size * (sorted.size+1))/2.0
-
-    while (selection.size != GENERATION_SIZE) {
-        val rand = randNumber()
-        for (i in sorted.size downTo 1) {
-            val prob = (i*(i-1))/(2*sum)
-            if (rand > prob){
-                if (genes[i-1].selected) break
-                genes[i-1].selected = true
-                selection.add(genes[i-1])
-                break
-            }
-        }
-    }
+//    val sum = (sorted.size * (sorted.size+1))/2.0
+//
+//    while (selection.size != GENERATION_SIZE) {
+//        val rand = randNumber()
+//        for (i in sorted.size downTo 1) {
+//            val prob = (i*(i-1))/(2*sum)
+//            if (rand > prob){
+//                if (genes[i-1].selected) break
+//                genes[i-1].selected = true
+//                selection.add(genes[i-1])
+//                break
+//            }
+//        }
+//    }
 
     selection.forEach {
         it.selected = false
         it.fitness.set(0.0)
     }
 
-    return selection
+    return selection.takeLast(GENERATION_SIZE) as ArrayList<Gene>
 }
 
 fun separateWeights(gene: Gene): Pair<DoubleArray,DoubleArray> {
@@ -136,9 +136,8 @@ fun separateWeights(gene: Gene): Pair<DoubleArray,DoubleArray> {
 }
 
 fun variance(genes: ArrayList<Gene>): Double {
-    val fits = genes.stream().mapToDouble { it.fitness.get() }
-    val sum_x2 = fits.reduce{ acc, fit -> acc +fit*fit }.asDouble
-    var sumx_2 = fits.reduce{ acc, fit -> acc +fit }.asDouble
+    val sum_x2 = genes.stream().mapToDouble { it.fitness.get() }.reduce{ acc, fit -> acc +fit*fit }.asDouble
+    var sumx_2 = genes.stream().mapToDouble { it.fitness.get() }.reduce{ acc, fit -> acc +fit }.asDouble
     sumx_2 *= sumx_2
 
 
