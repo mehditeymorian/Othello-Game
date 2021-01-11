@@ -1,3 +1,5 @@
+package app
+
 import ai.AIPlayer
 import game.*
 
