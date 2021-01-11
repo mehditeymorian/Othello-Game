@@ -18,7 +18,7 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
         var bestPoint = Double.MIN_VALUE
         var bestMove = Cell(-1, -1)
         moveReducer
-            .reduce(availableCells as ArrayList<Cell>, state, 1, playerTurn)
+            .reduce(availableCells as ArrayList<Cell>, state, 0, playerTurn)
             .forEach {
                 val each = maxValue(state, boundary, it, playerTurn, 1)
                 if (each >= bestPoint) {
@@ -50,7 +50,7 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
         val opponent: Side = turn.flip()
         var bestPoint: Double
         var availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent), state, depth, opponent)
-
+        // if opponent has moves -> minimization
         if (availableCells.isNotEmpty()) {
             bestPoint = Double.MIN_VALUE
             availableCells.forEach {
@@ -62,7 +62,7 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
                 boundary[0] = max(boundary[0], bestPoint) // alpha = max(alpha,bestPoint)
             }
         }
-        else {
+        else { // player doesnt have any move -> current player play again -> maximizing again
             bestPoint = Double.MAX_VALUE
             availableCells = moveReducer.reduce(boardCalculator.availableCells(state, turn),state, depth, turn)
             availableCells.forEach {
@@ -101,7 +101,7 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
         val opponent: Side = turn.flip()
         var bestPoint: Double
         var availableCells = moveReducer.reduce(boardCalculator.availableCells(state, opponent), state, depth, opponent)
-
+        // if opponent has move -> maximizing
         if (availableCells.isNotEmpty()) {
             bestPoint = Double.MAX_VALUE
             availableCells.forEach {
@@ -113,7 +113,7 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
                 boundary[1] = min(boundary[1], bestPoint) // alpha = min(beta,bestPoint)
             }
         }
-        else {
+        else { // no move for opponent -> current player play again -> minimizing again
             bestPoint = Double.MIN_VALUE
             availableCells = moveReducer.reduce(boardCalculator.availableCells(state, turn),state, depth, turn)
             availableCells.forEach {
@@ -132,6 +132,7 @@ class AIPlayer(turn: Side, featureWeights: DoubleArray, moveReducerWeights: Doub
         return bestPoint
     }
 
+    // check whether we should stop going deeper in tree
     private fun isTerminalState(state: Array<Array<Side?>>, depth: Int): Boolean {
         return depth == MAX_DEPTH || state.isFull()
     }

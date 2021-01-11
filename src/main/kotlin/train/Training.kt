@@ -13,7 +13,7 @@ const val MIN_GENERATION_PRODUCTION = 5
 
 fun main() = runBlocking {
     initLogger()
-    val variances = ArrayList<Double>()
+    val variances = ArrayList<Double>() // variances of generations
     var lastGeneration: ArrayList<Gene>? = null
 
     while (produceNextGeneration(variances, lastGeneration)) {
@@ -21,6 +21,7 @@ fun main() = runBlocking {
         val generation = selectNextGeneration(lastGeneration)
         logGeneration(generation)
         val gamePool = createGamePool(generation.size)
+        // create a coroutine for each game
         gamePool.map { pair->
             launch(context = Dispatchers.Default) {
                 val g1 = generation[pair.first]
@@ -36,6 +37,7 @@ fun main() = runBlocking {
 
 }
 
+// create a list of gene pair to play with each other
 fun createGamePool(size: Int): ArrayList<Pair<Int, Int>> {
     val pool = ArrayList<Pair<Int, Int>>()
 
@@ -75,6 +77,10 @@ fun playWithGeneration(current: Gene,opponent: Gene) {
         logGame(current, opponent, disksCount, game.boardManager.toString())
 }
 
+/* if first generation -> create new generation
+   else if abs(new variance - avg variance) < 5% of avg variance -> don't create new generation
+   otherwise create new generation
+* */
 fun produceNextGeneration(variances: ArrayList<Double>, genes: ArrayList<Gene>?): Boolean {
     if (genes == null) return true
 
@@ -100,33 +106,34 @@ fun selectNextGeneration(genes: ArrayList<Gene>?): ArrayList<Gene> {
     } // produce from lastGeneration
 }
 
+// select survivors from last generation using reward selection
 fun rewardSelection(genes: ArrayList<Gene>):ArrayList<Gene> {
     val selection = ArrayList<Gene>()
     val sorted = genes.sortedBy {it.fitness.get() }
 
     logRewardSelection(sorted)
 
-//    val sum = (sorted.size * (sorted.size+1))/2.0
-//
-//    while (selection.size != GENERATION_SIZE) {
-//        val rand = randNumber()
-//        for (i in sorted.size downTo 1) {
-//            val prob = (i*(i-1))/(2*sum)
-//            if (rand > prob){
-//                if (genes[i-1].selected) break
-//                genes[i-1].selected = true
-//                selection.add(genes[i-1])
-//                break
-//            }
-//        }
-//    }
+    val sum = (sorted.size * (sorted.size+1))/2.0
+
+    while (selection.size != GENERATION_SIZE) {
+        val rand = randNumber()
+        for (i in sorted.size downTo 1) {
+            val prob = (i*(i-1))/(2*sum)
+            if (rand > prob){
+                if (genes[i-1].selected) break
+                genes[i-1].selected = true
+                selection.add(genes[i-1])
+                break
+            }
+        }
+    }
 
     selection.forEach {
         it.selected = false
         it.fitness.set(0.0)
     }
 
-    return sorted.takeLast(GENERATION_SIZE) as ArrayList<Gene>
+    return selection
 }
 
 fun separateWeights(gene: Gene): Pair<DoubleArray,DoubleArray> {

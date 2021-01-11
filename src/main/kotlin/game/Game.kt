@@ -20,11 +20,11 @@ class Game(private val player1: Player, private val player2: Player) : BoardEven
 
     override fun makeMove(turn: Side, availableCells: List<Cell>) {
 
-            boardManager.printBoardWithAvailableCells(availableCells)
-            boardManager.printScores()
-            println("${turn.name} Move:")
-        val move = if (turn == player1.playerTurn) player1.move(boardManager.state,availableCells)
-                    else player2.move(boardManager.state,availableCells)
+        boardManager.printBoardWithAvailableCells(availableCells)
+        boardManager.printScores()
+        println("${turn.name} Move:")
+        val move = if (turn == player1.playerTurn) player1.move(boardManager.state, availableCells)
+        else player2.move(boardManager.state, availableCells)
         boardManager.putDisk(move.x, move.y, availableCells)
 
 

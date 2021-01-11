@@ -13,7 +13,9 @@ fun main() {
     when (choice) {
         2 ->{ // human vs AI
             player1 = HumanPlayer(Side.BLACK)
-            player2 = AIPlayer(Side.WHITE,DoubleArray(10) { 1.0 },DoubleArray(10) { 1.0 })
+            val weights = doubleArrayOf(7.289 , 6.864 , 8.128 , 12.567 , 8.297 , 8.277)
+            val secondWeights = doubleArrayOf(12.188 , 7.926 , 5.992 , 12.648 , 4.596 , 6.761)
+            player2 = AIPlayer(Side.WHITE,weights,secondWeights)
         }
         else -> { // human vs human
             player1 = HumanPlayer(Side.BLACK)

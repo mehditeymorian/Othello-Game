@@ -9,7 +9,7 @@ const val FEATURES_COUNT = 6
 const val MAX_MOBILITY = 20.0
 
 const val FEATURE_DISK_DIFFERENCE = 0
-const val FEATURE_MOBILITY = 1
+const val FEATURE_OPPONENT_MOBILITY = 1
 const val FEATURE_POTENTIAL_MOBILITY = 2
 const val FEATURE_CORNER = 3
 const val FEATURE_PARITY = 4
@@ -20,7 +20,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
 
     fun calculate(state: Array<Array<Side?>>, side: Side): Double {
         return weights[FEATURE_DISK_DIFFERENCE] * disksDifferenceFeature(state, side) +
-                weights[FEATURE_MOBILITY] * mobilityFeature(state, side) +
+                weights[FEATURE_OPPONENT_MOBILITY] * opponentMobilityFeature(state, side) +
                 weights[FEATURE_POTENTIAL_MOBILITY] * potentialMobilityFeature(state, side) +
                 weights[FEATURE_CORNER] * cornerFeature(state, side) +
                 weights[FEATURE_PARITY] * parityFeature(state, side) +
@@ -35,7 +35,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
 
 
     // the less move opponent has the better it is
-    private fun mobilityFeature(state: Array<Array<Side?>>, side: Side): Double { // range 7 to 12
+    private fun opponentMobilityFeature(state: Array<Array<Side?>>, side: Side): Double { // range 7 to 12
         val opponentMoves = calculator.availableCells(state, side.flip()).size
         return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
     }
@@ -51,6 +51,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
         return (MAX_POTENTIAL_MOBILITY - frontiersCount) / MAX_POTENTIAL_MOBILITY
     }
 
+    // more corners we have the better it is
     private fun cornerFeature(state: Array<Array<Side?>>, side: Side): Double { // range 12 to 15
         var capturedCorners = 0
         cornerCells().forEach {
@@ -60,13 +61,14 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
         return capturedCorners / MAX_CAPTURED_CORNERS
     }
 
-    // current player played
+    // which player play the last move
     private fun parityFeature(state: Array<Array<Side?>>, side: Side): Double { // range 2 to 7
         val leftMoves = state.leftMoves()
         return if (leftMoves % 2 == 0) 1.0 else 0.0
     }
 
 
+    // disks that don't change throughout the game
     private fun stableDisksFeature(state: Array<Array<Side?>>, side: Side): Double { // range 10 to 15
 
         val visitedCells = Array(state.size){BooleanArray(state.size)}
@@ -214,9 +216,7 @@ class Utility(private val calculator: BoardCalculator, private val weights: Doub
                 }
             }
         }
-//    stableCells.distinct().forEach {
-//        println("x : "+it.x + " || y : "+it.y)
-//    }
+
         return stableCells.size.toDouble()/64
     }
 

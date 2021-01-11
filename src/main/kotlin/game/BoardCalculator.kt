@@ -1,6 +1,7 @@
 package game
 
 const val BOARD_SIZE = 8
+
 class BoardCalculator {
     var blackDisks: Int = 0
     var whiteDisks: Int = 0
@@ -479,7 +480,7 @@ class BoardCalculator {
     }
 
     fun getDisksCount(): Pair<Int, Int> {
-        return Pair(blackDisks,whiteDisks)
+        return Pair(blackDisks, whiteDisks)
     }
 
 }

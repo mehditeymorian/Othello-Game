@@ -3,10 +3,9 @@ package game
 import java.lang.StringBuilder
 
 class BoardManager(private val eventListener: BoardEventListener) {
-    private val calculator : BoardCalculator = BoardCalculator()
+    private val calculator: BoardCalculator = BoardCalculator()
     var state: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
     var turn: Side = Side.BLACK
-
 
 
     fun initBoard() {
@@ -25,7 +24,7 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
     // all initialization
     fun start() {
-        eventListener.makeMove(turn, calculator.availableCells(state,turn))
+        eventListener.makeMove(turn, calculator.availableCells(state, turn))
     }
 
 
@@ -38,20 +37,22 @@ class BoardManager(private val eventListener: BoardEventListener) {
         }
 
 
-        state.play(Cell(x,y),turn,calculator)
-        if (calculator.isGameFinished(state)) {
+        // play the move
+        state.play(Cell(x, y), turn, calculator)
+        if (calculator.isGameFinished(state)) { // show the result
             eventListener.onGameFinish(calculator.getWinner())
             return
         }
 
         turn = turn.flip()
         var list = calculator.availableCells(state, turn)
-        if (list.isEmpty()) { // no move possible
+        if (list.isEmpty()) { // no move possible for turn
             println("No legal move for $turn")
             turn = turn.flip()
             list = calculator.availableCells(state, turn)
         }
 
+        // no other player doesn't have move either, the game is finished
         if (list.isEmpty()) {
             eventListener.onGameFinish(calculator.getWinner())
             return
@@ -78,11 +79,11 @@ class BoardManager(private val eventListener: BoardEventListener) {
 
         println("===========================")
         print("   ")
-        for (i in 0..7) print(" ${'A'+i} ")
+        for (i in 0..7) print(" ${'A' + i} ")
         println()
         var i = 0
         copy.forEach {
-            print(" ${i+1} ")
+            print(" ${i + 1} ")
             it.forEach(::print)
             println()
             i++
@@ -102,11 +103,11 @@ class BoardManager(private val eventListener: BoardEventListener) {
         val builder = StringBuilder()
         builder.append("===========================\n")
         builder.append("   ")
-        for (i in 0..7) builder.append(" ${'A'+i} ")
+        for (i in 0..7) builder.append(" ${'A' + i} ")
         builder.append("\n")
         var i = 0
         state.forEach {
-            builder.append(" ${i+1} ")
+            builder.append(" ${i + 1} ")
             it.forEach { side: Side? -> builder.append(if (side == null) "   " else if (side == Side.BLACK) " B " else " W ") }
             builder.append("\n")
             i++

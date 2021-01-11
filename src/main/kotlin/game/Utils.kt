@@ -2,14 +2,6 @@ package game
 
 import kotlin.math.abs
 
-fun Array<Array<Side?>>.copy(): Array<Array<Side?>> {
-    val board: Array<Array<Side?>> = Array(BOARD_SIZE) { arrayOfNulls(BOARD_SIZE) }
-    for (x in this.indices) for (y in this.indices) {
-        val side = this[x][y]
-        board[x][y] = side
-    }
-    return board
-}
 
 fun Array<Array<Side?>>.play(cell: Cell, turn: Side, calculator: BoardCalculator): List<Cell> {
     this[cell.x][cell.y] = turn // put disk
@@ -83,16 +75,12 @@ fun Array<Array<Side?>>.countDisks(): Pair<Int, Int> {
     return Pair(whiteDisks, blackDisks)
 }
 
-fun Array<Array<Side?>>.isStable(cell: Cell): Boolean {
-    return false
-}
-
 fun manhattanDistance(c1: Cell, c2: Cell): Int {
     return abs(c1.x - c2.x) + abs(c1.y - c2.y)
 }
 
 
-
+// use to find stable disks in board
 fun checkUp(state: Array<Array<Side?>>, side: Side , x : Int, y :Int): Boolean {
     var i = x
     while (i >= 0) {

@@ -12,10 +12,10 @@ const val MOVE_EVALUATE_FEATURES = 7
 const val MOVE_LIMIT = 3L
 
 const val REDUCER_CORNER = 0
-const val REDUCER_EDGE = 1
+const val REDUCER_PLAYING_MIDDLE = 1
 const val REDUCER_FLIP = 2
 const val REDUCER_GIVING_CORNER = 3
-const val REDUCER_MOBILITY = 4
+const val REDUCER_OPPONENT_MOBILITY = 4
 const val REDUCER_CORNER_NEIGHBOR = 5
 
 
@@ -28,20 +28,17 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
 
     fun reduce(moves: ArrayList<Cell>, state: Array<Array<Side?>>, depth: Int, turn: Side): List<Cell> {
-        return if (depth == 1) moves
-        else {
-            val list = moves.stream()
-                .sorted { c1, c2 ->
-                    val c2Points = calculate(state, c2, turn)
-                    val c1Points = calculate(state, c1, turn)
-                    val sortValue = c2Points - c1Points
-                    if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0
-                }
-                .limit(getMovesLimit(moves.size, depth))
-                .collect(Collectors.toList())
-            list.shuffle()
-            list
-        }
+        val list = moves.stream()
+            .sorted { c1, c2 ->
+                val c2Points = calculate(state, c2, turn)
+                val c1Points = calculate(state, c1, turn)
+                val sortValue = c2Points - c1Points
+                if (sortValue > 0) 1 else if (sortValue < 0) -1 else 0
+            }
+            .limit(getMovesLimit(moves.size, depth))
+            .collect(Collectors.toList())
+        list.shuffle()
+        return list
 
     }
 
@@ -52,23 +49,23 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
 
 
     private fun calculate(state: Array<Array<Side?>>, cell: Cell, side: Side): Double {
-        return weights[REDUCER_CORNER] * cornerFeature(cell) +
-                weights[REDUCER_EDGE] * edgeFeature(state, cell) +
+        return weights[REDUCER_CORNER] * takeCornerFeature(cell) +
+                weights[REDUCER_PLAYING_MIDDLE] * playingMiddleFeature(state, cell) +
                 weights[REDUCER_FLIP] * flipFeature(state, cell, side) +
                 weights[REDUCER_GIVING_CORNER] * givingCornerFeature(state, cell, side) +
-                weights[REDUCER_MOBILITY] * mobilityFeature(state, cell, side) +
+                weights[REDUCER_OPPONENT_MOBILITY] * opponentMobilityFeature(state, cell, side) +
                 weights[REDUCER_CORNER_NEIGHBOR] * cornerNeighborFeature(state, cell, side)
     }
 
     /* if cell is corner it's really good
     */
-    private fun cornerFeature(cell: Cell): Double { // range 10 to 15
+    private fun takeCornerFeature(cell: Cell): Double { // range 10 to 15
         return if (cell in cornerCells()) 1.0 else 0.0
     }
 
     /* in the beginning of the game, cells in the middle are better
     */
-    private fun edgeFeature(state: Array<Array<Side?>>, cell: Cell): Double { // range 1 to 8
+    private fun playingMiddleFeature(state: Array<Array<Side?>>, cell: Cell): Double { // range 1 to 8
         // for last 30 disk return 0
         if (state.leftMoves() < 30) return 0.0
 
@@ -99,6 +96,8 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
         else (MAX_FLIP - flips) / MAX_FLIP
     }
 
+    /* if choosing a move cause to give corner to opoonent in next turn
+    * */
     private fun givingCornerFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 8 to 13
         val flippedCells = state.play(cell, turn, calculator)
         val opponentAvailableCell = calculator.availableCells(state, turn.flip())
@@ -112,14 +111,16 @@ class MoveReducer(private val calculator: BoardCalculator, private val weights: 
     /* if we choose this cell how many moves does opponent get
     * the less moves gives to opponent the better current move it is
     */
-    private fun mobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 4 to 8
+    private fun opponentMobilityFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // range 4 to 8
         val flippedCells = state.play(cell, turn, calculator)
         val opponentMoves = calculator.availableCells(state, turn.flip()).size
         state.undoMove(cell, flippedCells) // undo the move played
         return (MAX_MOBILITY - opponentMoves) / MAX_MOBILITY
     }
 
-    private fun cornerNeighborFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double {
+    /* check moves on the border of game surface
+    * */
+    private fun cornerNeighborFeature(state: Array<Array<Side?>>, cell: Cell, turn: Side): Double { // 3 to 7
         val (corner, _) = nearestCornerTo(cell)
         val dangerCells = dangerCellOf(corner)
         val cornerDisk = state.getOrNull(corner.x, corner.y)
