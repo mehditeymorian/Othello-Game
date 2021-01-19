@@ -16,4 +16,4 @@ refer to [Releases](https://github.com/mehditeymorian/Othello-Game/releases) for
 
 
 ## Acknowledgement
-I would like to express my thanks of gratitude to amazing Haniye who helped me to complete this project.
+I would like to express my thanks of gratitude to amazing Haniye who helped me complete this project.
