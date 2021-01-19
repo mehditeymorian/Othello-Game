@@ -7,3 +7,13 @@ You can find full report [here](https://github.com/mehditeymorian/Othello-Game/b
 
 ### Play the game
 refer to [Releases](https://github.com/mehditeymorian/Othello-Game/releases) for latest version of game to play.
+
+
+![Game Start](https://github.com/mehditeymorian/Othello-Game/blob/master/Assets/game-start.png)
+
+
+![Game play](https://github.com/mehditeymorian/Othello-Game/blob/master/Assets/game-playing.png)
+
+
+## Acknowledgement
+I would like to express my thanks of gratitude to amazing Haniye who helped me to complete this project.
