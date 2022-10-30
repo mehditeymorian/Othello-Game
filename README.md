@@ -1,7 +1,6 @@
 # Othello-Game
-Implementation of Othello game with model training using evolutionary alogrithms. 
-This project consists of three section, game logic, Minimax tree for AI model and training using evolutionary alogirthms.
-You can find full report [here](https://github.com/mehditeymorian/Othello-Game/blob/master/Assets/report.pdf).
+Implementation of Othello game with model training using a heuristic evolutionary alogrithm. 
+This project consists of three sections, game logic, Minimax as a decision rule, which the model chooses the actions upon, and training the model using evolutionary alogirthm. [Technical Report](http://dx.doi.org/10.13140/RG.2.2.24354.91846).
 
 ![Shakespeare Tragedy](https://github.com/mehditeymorian/Othello-Game/blob/master/Assets/othello-shakespeare.jpg)
 
